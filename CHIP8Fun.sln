@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHIP8Fun", "CHIP8Fun\CHIP8Fun.csproj", "{2B47C708-7B6F-4E1A-BBB5-86AD65C1E309}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHIP8Fun.WPF", "CHIP8Fun.WPF\CHIP8Fun.WPF.csproj", "{DA5B681A-6C69-4FE6-9607-A633026B57E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{2B47C708-7B6F-4E1A-BBB5-86AD65C1E309}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B47C708-7B6F-4E1A-BBB5-86AD65C1E309}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B47C708-7B6F-4E1A-BBB5-86AD65C1E309}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA5B681A-6C69-4FE6-9607-A633026B57E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA5B681A-6C69-4FE6-9607-A633026B57E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA5B681A-6C69-4FE6-9607-A633026B57E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA5B681A-6C69-4FE6-9607-A633026B57E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

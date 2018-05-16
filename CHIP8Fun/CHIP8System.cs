@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace CHIP8Fun
 {
@@ -14,7 +17,7 @@ namespace CHIP8Fun
         /// The system expects the application to be loaded at memory location 0x200.
         /// This means that your program counter should also be set to this location.
         /// </summary>
-        public CHIP8System()
+        public CHIP8System(Bitmap image)
         {
             Memory = new byte[4096];
             V = new byte[16];
@@ -39,6 +42,7 @@ namespace CHIP8Fun
             }
 
             cpu = new Opcodes(this);
+            gpu = new GPU(image,64,32);
 
 
             // Reset timers
@@ -115,7 +119,7 @@ namespace CHIP8Fun
                     switch (opcode & 0x000F)
                     {
                         case 0x0000: // 0x00E0: Clears the screen
-                            // Execute opcode
+                            cpu._00E0();
                             break;
 
                         case 0x000E: // 0x00EE: Returns from subroutine
@@ -156,6 +160,34 @@ namespace CHIP8Fun
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        /// <summary>
+        /// Resets the status of the keys pressed
+        /// </summary>
+        public void SetKeys()
+        {
+            for (var i = 0; i < Keys.Length; i++)
+            {
+                Keys[i] = 0;
+            }
+        }
+
+        /// <summary>
+        /// Returns the value of any key pressed
+        /// </summary>
+        /// <returns></returns>
+        public byte AnyKeyPressed()
+        {
+            for (var i = 0; i < Keys.Length; i++)
+            {
+                if (Keys[i] != 0)
+                {
+                    return Keys[i];
+                }
+            }
+
+            return 0;
         }
 
         #region System specification
@@ -227,9 +259,11 @@ namespace CHIP8Fun
         /// Finally, the Chip 8 has a HEX based keypad (0x0-0xF),
         /// you can use an array to store the current state of the key.
         /// </summary>
-        public  byte[] Keys;
+        public byte[] Keys;
 
         private readonly Opcodes cpu;
+
+        public readonly GPU gpu;
 
         #region fontset
 

@@ -1,6 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
 
 using System;
+using System.Drawing;
 
 namespace CHIP8Fun
 {
@@ -34,11 +35,31 @@ namespace CHIP8Fun
         public void FX0A(short code)
         {
             Console.WriteLine($"Executing: {code:X}");
-            var key = Console.ReadKey();
-            Console.Write("\b");
             var X = (code & 0x0F00) >> 8;
-            s.V[X] = Convert.ToByte(key.KeyChar);
-            s.Pc += 2;
+            //Blocking operation. Waits for a key to be pressed
+            var key = s.AnyKeyPressed();
+            if (key != 0)
+            {
+                s.V[X] = s.AnyKeyPressed();
+                s.Pc += 2;
+            }
+        }
+
+        /// <summary>
+        /// Display
+        /// Clears the screen.
+        /// </summary>
+        public void _00E0()
+        {
+            for (var i = 0; i < s.Gfx.GetLength(0); i++)
+            {
+                for (var j = 0; j < s.Gfx.GetLength(1); j++)
+                {
+                    s.Gfx[i,j] = 255;
+                }
+            }
+
+            s.V[15] = 1;
         }
     }
 }

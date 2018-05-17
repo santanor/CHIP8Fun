@@ -5,11 +5,15 @@ using System.IO;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Color = System.Drawing.Color;
 
 namespace CHIP8Fun
 {
     public class Emulator
     {
+        public delegate void NewFrame(Bitmap img);
+
+        public NewFrame OnNewFrame;
         private static CHIP8System chip8;
         private Bitmap backingImage;
 
@@ -17,15 +21,8 @@ namespace CHIP8Fun
         /// Emulator Loop
         /// </summary>
         /// <param name="args"></param>
-        public void Run(out ImageSource image)
-        {
-            image = null;
-            // Set up render system and register input callbacks
-            image = SetupGraphics(image as BitmapImage);
-            image.Freeze();
-
-
-            // Initialize the Chip8 system and load the game into the memory
+        public void Run()
+        {// Initialize the Chip8 system and load the game into the memory
             chip8 = new CHIP8System(backingImage);
             chip8.LoadProgram("Clock.ch8");
 
@@ -38,7 +35,9 @@ namespace CHIP8Fun
                 // If the draw flag is set, update the screen
                 if (chip8.V[15] == 1)
                 {
-                    DrawGraphics();
+                    var newFrame = DrawGraphics();
+                    OnNewFrame?.Invoke(newFrame);
+                    chip8.V[15] = 0;
                 }
 
 
@@ -47,22 +46,17 @@ namespace CHIP8Fun
             }
         }
 
-        private void DrawGraphics()
+        private Bitmap DrawGraphics()
         {
-            
-        }
-
-        private ImageSource SetupGraphics(BitmapImage image)
-        {
-            backingImage = new Bitmap(64, 32);
-            var ms = new MemoryStream();
-            backingImage.Save(ms, ImageFormat.Bmp);
-            image = new BitmapImage();
-            image.BeginInit();
-            ms.Seek(0, SeekOrigin.Begin);
-            image.StreamSource = ms;
-            image.EndInit();
-            return image;
+            var bmp = new Bitmap(64,32);
+            for (var i = 0; i < 64; i++)
+            {
+                for (var j = 0; j < 32; j++)
+                {
+                    bmp.SetPixel(i,j, chip8.Gfx[i,j] == 1 ? Color.GhostWhite : Color.Black);
+                }
+            }
+            return bmp;
         }
 
         public void OnKeyPressed(object sender, KeyEventArgs keyEventArgs)

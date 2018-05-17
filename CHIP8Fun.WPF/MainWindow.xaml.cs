@@ -1,7 +1,8 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Threading;
-using System.Windows.Controls;
-using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace CHIP8Fun.WPF
 {
@@ -11,7 +12,6 @@ namespace CHIP8Fun.WPF
     public partial class MainWindow
     {
         private Emulator emulator;
-        private ImageSource imgSource;
 
         public MainWindow()
         {
@@ -20,16 +20,32 @@ namespace CHIP8Fun.WPF
             var thread = new Thread(() =>
             {
                 emulator = new Emulator();
-                emulator.Run(out imgSource);
+                emulator.Run();
             });
 
             thread.Start();
 
-            while (imgSource == null);
+            while (emulator == null)
+            {
+                ;
+            }
 
             KeyDown += emulator.OnKeyPressed;
-            imgSource.Freeze();
-            bmp.Source = imgSource;
+            emulator.OnNewFrame += OnImageChanged;
+        }
+
+        private void OnImageChanged(Bitmap bmpSource)
+        {
+            var ms = new MemoryStream();
+            bmpSource.Save(ms, ImageFormat.Bmp);
+            var image = new BitmapImage();
+            image.BeginInit();
+            ms.Seek(0, SeekOrigin.Begin);
+            image.StreamSource = ms;
+            image.EndInit();
+            image.Freeze();
+
+            bmp.Dispatcher.Invoke(() => {bmp.Source = image;});
         }
     }
 }

@@ -60,6 +60,7 @@ namespace CHIP8Fun
             }
 
             s.V[15] = 1;
+            s.Pc += 2;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media;
@@ -110,6 +111,9 @@ namespace CHIP8Fun
                 case 0xF000: // FX0A: Wait for key press, store key pressed in VX
                     cpu.FX0A(code);
                     break;
+                case 0x6000:
+                    cpu._6XNN(code);
+                    break;
 
                 //In some cases we can not rely solely on the first four bits to see what the opcode means.
                 //For example, 0x00E0 and 0x00EE both start with 0x0.
@@ -127,7 +131,7 @@ namespace CHIP8Fun
                             break;
 
                         default:
-                            Console.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
                             break;
                     }
 
@@ -136,7 +140,7 @@ namespace CHIP8Fun
 
 
                 default:
-                    Console.WriteLine($"Unknown opcode: {opcode:X}");
+                    Debug.WriteLine($"Unknown opcode: {opcode:X}");
                     break;
             }
         }

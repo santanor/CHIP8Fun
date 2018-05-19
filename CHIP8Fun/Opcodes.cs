@@ -36,7 +36,7 @@ namespace CHIP8Fun
             {
                 for (var j = 0; j < s.Gfx.GetLength(1); j++)
                 {
-                    s.Gfx[i, j] = 255;
+                    s.Gfx[i, j] = true;
                 }
             }
 
@@ -71,7 +71,17 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _2NNN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            if (s.Sp >= s.Stack.Length)
+            {
+                Debug.WriteLine($"Stack Overflow! opcode{code:X}");
+                return;
+            }
+
+            var label = code & 0xFFF; //get the label address from the opcode
+            s.Stack[s.Sp] = s.Pc;//backup the current PC in the stack
+            s.Sp++;//Increment the stack pointer to an empty position
+            s.Pc = (short)label;//Move the PC to the label
         }
 
         /// <summary>
@@ -129,7 +139,7 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _7XNN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            //throw new NotImplementedException($"code: {code:X} not implemented");
         }
 
         /// <summary>
@@ -287,7 +297,21 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void DXYN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+            var N = (code & 0x000F);
+
+            //Create a temp array to hold the bytes for the sprite
+            var spriteData = new byte[N];
+            for (var i = 0; i < N; i++)
+            {
+                spriteData[i] = s.Memory[s.I + i];
+            }
+
+            s.Draw(s.V[X],s.V[Y], spriteData);
+            s.Pc += 2;
         }
 
         /// <summary>

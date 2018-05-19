@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Configuration;
 using System.IO;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Runtime.Serialization.Formatters;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -22,7 +27,7 @@ namespace CHIP8Fun
         {
             Memory = new byte[4096];
             V = new byte[16];
-            Gfx = new byte[64, 32];
+            Gfx = new bool[64, 32];
             Stack = new short[16];
             Keys = new byte[16];
 
@@ -93,6 +98,27 @@ namespace CHIP8Fun
             return (short)((Memory[Pc] << 8) | Memory[Pc + 1]);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="sprite"></param>
+        public void Draw(int x, int y, byte[] sprite)
+        {
+            var spriteBits = new BitArray(sprite);
+            for (var i = 0; i < sprite.Length; i++)
+            {
+                for (var j = 0; j < 8; j++)
+                {
+                    Gfx[j, i] = spriteBits[(i * 8) + j];
+                }
+            }
+
+            //Notify the system to redraw the screen
+            V[15] = 1;
+        }
+
 
         /// <summary>
         /// Here's where most of the magic happens, it routes the execution of the emulator decoding the opcode
@@ -103,16 +129,104 @@ namespace CHIP8Fun
         {
             switch (code & 0xF000)
             {
-                // Some opcodes //
-
-                case 0xA000: // ANNN: Sets I to the address NNN
-                    cpu.ANNN(code);
+                case 0x1000:
+                    cpu._1NNN(code);
                     break;
-                case 0xF000: // FX0A: Wait for key press, store key pressed in VX
-                    cpu.FX0A(code);
+                case 0x2000:
+                    cpu._2NNN(code);
+                    break;
+                case 0x3000:
+                    cpu._3XNN(code);
+                    break;
+                case 0x4000:
+                    cpu._4XNN(code);
+                    break;
+                case 0x5000:
+                    cpu._5XY0(code);
                     break;
                 case 0x6000:
                     cpu._6XNN(code);
+                    break;
+                case 0x7000:
+                    cpu._7XNN(code);
+                    break;
+                case 0x8000:
+                    cpu._8XY0(code);
+                    break;
+                case 0x8001:
+                    cpu._8XY1(code);
+                    break;
+                case 0x8002:
+                    cpu._8XY2(code);
+                    break;
+                case 0x8003:
+                    cpu._8XY3(code);
+                    break;
+                case 0x8004:
+                    cpu._8XY4(code);
+                    break;
+                case 0x8005:
+                    cpu._8XY5(code);
+                    break;
+                case 0x8006:
+                    cpu._8XY6(code);
+                    break;
+                case 0x8007:
+                    cpu._8XY7(code);
+                    break;
+                case 0x800E:
+                    cpu._8XYE(code);
+                    break;
+                case 0x9000:
+                    cpu._9XY0(code);
+                    break;
+                case 0xA000:
+                    cpu.ANNN(code);
+                    break;
+                case 0xB000:
+                    cpu.BNNN(code);
+                    break;
+                case 0xC000:
+                    cpu.CXNN(code);
+                    break;
+                case 0xD000:
+                    cpu.DXYN(code);
+                    break;
+                case 0xE09E:
+                    cpu.EX9E(code);
+                    break;
+                case 0xE0A1:
+                    cpu.EXA1(code);
+                    break;
+                case 0xF007:
+                    cpu.FX07(code);
+                    break;
+                case 0xF00A:
+                    cpu.FX0A(code);
+                    break;
+                case 0xF015:
+                    cpu.FX15(code);
+                    break;
+                case 0xF018:
+                    cpu.FX18(code);
+                    break;
+                case 0xF01E:
+                    cpu.FX1E(code);
+                    break;
+                case 0xF029:
+                    cpu.FX29(code);
+                    break;
+                case 0xF033:
+                    cpu.FX33(code);
+                    break;
+                case 0xF055:
+                    cpu.FX55(code);
+                    break;
+                case 0xF065:
+                    cpu.FX65(code);
+                    break;
+                case 0xF000: // FX0A: Wait for key press, store key pressed in VX
+                    cpu.FX0A(code);
                     break;
 
                 //In some cases we can not rely solely on the first four bits to see what the opcode means.
@@ -125,11 +239,9 @@ namespace CHIP8Fun
                         case 0x0000: // 0x00E0: Clears the screen
                             cpu._00E0();
                             break;
-
                         case 0x000E: // 0x00EE: Returns from subroutine
-                            // Execute opcode
+                            cpu._00EE(code);
                             break;
-
                         default:
                             Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
                             break;
@@ -234,7 +346,7 @@ namespace CHIP8Fun
         /// The graphics of the Chip 8 are black and white and the screen has a total of 2048 pixels (64 x 32).
         /// This can easily be implemented using an array that hold the pixel state (1 or 0):
         /// </summary>
-        public byte[,] Gfx;
+        public bool[,] Gfx;
 
         /// <summary>
         /// Interupts and hardware registers. The Chip 8 has none,

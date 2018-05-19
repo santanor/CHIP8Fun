@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="320" Width="640">
+        Title="MainWindow" Height="480" Width="640">
     <Grid>
-        <Image Name="bmp" MaxWidth="64" MaxHeight="32" Width="64" Height="32"></Image>
+        <Image
+            Name="bmp"
+            RenderOptions.BitmapScalingMode="NearestNeighbor"></Image>
     </Grid>
 </Window>

@@ -53,7 +53,7 @@ namespace CHIP8Fun
             {
                 for (var j = 0; j < 32; j++)
                 {
-                    bmp.SetPixel(i,j, chip8.Gfx[i,j] == 1 ? Color.GhostWhite : Color.Black);
+                    bmp.SetPixel(i,j, chip8.Gfx[i,j] ? Color.Black : Color.White);
                 }
             }
             return bmp;

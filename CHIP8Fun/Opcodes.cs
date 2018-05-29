@@ -51,7 +51,10 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _00EE(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            s.Sp--;
+            s.Pc = s.Stack[s.Sp];
+            s.Stack[s.Sp] = 0;
+
         }
 
         /// <summary>
@@ -61,7 +64,9 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _1NNN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var address = code & 0xFFF;
+            s.Pc = (short)address;
         }
 
         /// <summary>
@@ -79,7 +84,7 @@ namespace CHIP8Fun
             }
 
             var label = code & 0xFFF; //get the label address from the opcode
-            s.Stack[s.Sp] = s.Pc;//backup the current PC in the stack
+            s.Stack[s.Sp] = (short)(s.Pc+2);//backup the current PC in the stack
             s.Sp++;//Increment the stack pointer to an empty position
             s.Pc = (short)label;//Move the PC to the label
         }
@@ -93,8 +98,19 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _3XNN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
-        }
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var NN = (code & 0x00FF);
+
+            if (s.V[X] == NN)
+            {
+                s.Pc += 4;
+            }
+            else
+            {
+                s.Pc += 2;
+            }
+    }
 
         /// <summary>
         /// Cond
@@ -104,7 +120,18 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _4XNN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var NN = (code & 0x00FF);
+
+            if (s.V[X] != NN)
+            {
+                s.Pc += 4;
+            }
+            else
+            {
+                s.Pc += 2;
+            }
         }
 
         /// <summary>
@@ -115,7 +142,18 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _5XY0(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            if (s.V[X] == s.V[Y])
+            {
+                s.Pc += 4;
+            }
+            else
+            {
+                s.Pc += 2;
+            }
         }
 
         /// <summary>
@@ -139,7 +177,12 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _7XNN(short code)
         {
-            //throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var NN = (code & 0x00FF);
+
+            s.V[X] += (byte)NN;
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -150,7 +193,13 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY0(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[X] = s.V[Y];
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -161,29 +210,51 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY1(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[X] = (byte)(s.V[X] | s.V[Y]);
+
+            s.Pc += 2;
         }
 
         /// <summary>
         /// BitOp Vx=Vx&Vy
-        /// Sets VX to VX and VY. (Bitwise AND operation)
+        /// Sets VX to VX and VY. (Bitwise AND operation) VF is reset to 0.
         /// </summary>
         /// <param name="code"></param>
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY2(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[X] = (byte)(s.V[X] & s.V[Y]);
+
+            s.V[s.VF] = 0;
+
+            s.Pc += 2;
         }
 
         /// <summary>
         /// BitOp Vx=Vx^Vy
-        /// Sets VX to VX xor VY.
+        /// Sets VX to VX xor VY. VF is reset to 0.
         /// </summary>
         /// <param name="code"></param>
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY3(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[X] = (byte)(s.V[X] ^ s.V[Y]);
+
+            s.V[s.VF] = 0;
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -194,7 +265,15 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY4(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[s.VF] = s.V[X] + s.V[Y] > 0xFF ? (byte)1 : (byte)0;
+
+            s.V[X] += s.V[Y];
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -205,7 +284,15 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY5(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[s.VF] = s.V[X] < s.V[Y] ? (byte)1 : (byte)0;
+
+            s.V[X] = (byte)(s.V[X] - s.V[Y]);
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -217,7 +304,15 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY6(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[s.VF] = (byte)(s.V[X] & 0x1);
+            var cachedVY = s.V[Y];
+            s.V[X] = (byte)(cachedVY >> 1);
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -228,7 +323,15 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY7(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[s.VF] = s.V[X] > s.V[Y] ? (byte)1 : (byte)0;
+
+            s.V[X] = (byte)(s.V[Y] - s.V[X]);
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -240,7 +343,15 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XYE(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            s.V[s.VF] = (byte)(s.V[Y] & 0x1);
+            var cachedVY = s.V[Y];
+            s.V[X] = (byte)(cachedVY << 1);
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -251,7 +362,18 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _9XY0(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var Y = (code & 0x00F0) >> 4;
+
+            if (s.V[X] != s.V[Y])
+            {
+                s.Pc += 4;
+            }
+            else
+            {
+                s.Pc += 2;
+            }
         }
 
         /// <summary>
@@ -273,7 +395,11 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void BNNN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var address = (short)(code & 0x0FFF);
+            address += s.V[0];
+
+            s.Pc = address;
         }
 
         /// <summary>
@@ -283,11 +409,18 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void CXNN(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+            var NN = (code & 0x00FF);
+
+            var rand = new Random().Next(0, 255);
+
+            s.V[X] = (byte)(rand & NN);
+            s.Pc += 2;
         }
 
         /// <summary>
-        /// Disp	draw(Vx,Vy,N)
+        /// Disp    draw(Vx,Vy,N)
         /// Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
         /// Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t
         /// change after the execution of this instruction. As described above,
@@ -333,7 +466,17 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void EXA1(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+
+            if (s.Keys[s.V[X]] == 0)
+            {
+                s.Pc += 4;
+            }
+            else
+            {
+                s.Pc += 2;
+            }
         }
 
         /// <summary>
@@ -343,7 +486,12 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX07(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var X = (code & 0x0F00) >> 8;
+
+            s.V[X] = s.DelayTimer;
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -372,7 +520,12 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX15(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var x = (code & 0xF00) >> 8;
+
+            s.DelayTimer = s.V[x];
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -382,7 +535,12 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX18(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var x = (code & 0xF00) >> 8;
+
+            s.SoundTimer = s.V[x];
+
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -403,12 +561,17 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX29(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var x = (code & 0xF00) >> 8;
+
+            s.I = (byte)(s.V[x] * 0x5);
+
+            s.Pc += 2;
         }
 
         /// <summary>
         /// BCD	set_BCD(Vx); *(I+0)=BCD(3); *(I+1)=BCD(2); *(I+2)=BCD(1);
-        ///Stores the binary-coded decimal representation of VX,
+        /// Stores the binary-coded decimal representation of VX,
         /// with the most significant of three digits at the address in I,
         /// the middle digit at I plus 1, and the least significant digit at I plus 2.
         /// (In other words, take the decimal representation of VX,
@@ -418,7 +581,15 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX33(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var x = (code & 0xF00) >> 8;
+            var value = s.V[x];
+            s.Memory[s.I] = (byte)(value / 100);
+            s.Memory[s.I + 1]= (byte)((value / 10) % 10);
+            s.Memory[s.I + 2]= (byte)((value % 100) % 10);
+            s.Pc += 2;
+
+
         }
 
         /// <summary>
@@ -439,7 +610,16 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX65(short code)
         {
-            throw new NotImplementedException($"code: {code:X} not implemented");
+            Debug.WriteLine($"Executing: {code:X}");
+            var x = (code & 0xF00) >> 8;
+
+            for (var i = 0; i <= x; i++)
+            {
+                s.V[i] = s.Memory[s.I];
+                s.I++;
+            }
+
+            s.Pc += 2;
         }
     }
 }

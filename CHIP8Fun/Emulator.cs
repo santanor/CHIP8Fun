@@ -20,11 +20,10 @@ namespace CHIP8Fun
         /// <summary>
         /// Emulator Loop
         /// </summary>
-        /// <param name="args"></param>
         public void Run()
         {// Initialize the Chip8 system and load the game into the memory
             chip8 = new CHIP8System(backingImage);
-            chip8.LoadProgram("Clock.ch8");
+            chip8.LoadProgram("Pong.ch8");
 
             // Emulation loop
             while (true)
@@ -59,7 +58,7 @@ namespace CHIP8Fun
             return bmp;
         }
 
-        public void OnKeyPressed(object sender, KeyEventArgs keyEventArgs)
+        public static void OnKeyPressed(object sender, KeyEventArgs keyEventArgs)
         {
             switch (keyEventArgs.Key)
             {

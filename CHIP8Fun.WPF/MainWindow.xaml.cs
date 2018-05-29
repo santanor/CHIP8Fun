@@ -32,7 +32,7 @@ namespace CHIP8Fun.WPF
                 ;
             }
 
-            KeyDown += emulator.OnKeyPressed;
+            KeyDown += Emulator.OnKeyPressed;
             emulator.OnNewFrame += OnImageChanged;
         }
 
@@ -50,39 +50,6 @@ namespace CHIP8Fun.WPF
                 image.Freeze();
                 bmp.Source = image;
             });
-        }
-
-        private void ResizeImage(ref Bitmap image, int canvasWidth, int canvasHeight)
-        {
-            var resultBmp = new Bitmap(canvasWidth, canvasHeight); // changed parm names
-            var graphic = Graphics.FromImage(resultBmp);
-
-            graphic.InterpolationMode = InterpolationMode.NearestNeighbor;
-            // graphic.SmoothingMode = SmoothingMode.None;
-            // graphic.PixelOffsetMode = PixelOffsetMode.Half;
-            // graphic.CompositingQuality = CompositingQuality.AssumeLinear;
-
-            /* ------------------ new code --------------- */
-
-            // Figure out the ratio
-            var ratioX = canvasWidth / (double)32;
-            var ratioY = canvasHeight / (double)64;
-            // use whichever multiplier is smaller
-            var ratio = ratioX < ratioY ? ratioX : ratioY;
-
-            // now we can get the new height and width
-            var newHeight = Convert.ToInt32(32 * ratio);
-            var newWidth = Convert.ToInt32(64 * ratio);
-
-            // Now calculate the X,Y position of the upper-left corner
-            // (one of these will always be zero)
-            var posX = Convert.ToInt32((canvasWidth - 32 * ratio) / 2);
-            var posY = Convert.ToInt32((canvasHeight - 64 * ratio) / 2);
-
-            graphic.Clear(Color.White); // white padding
-            graphic.DrawImage(image, posX, posY, newWidth, newHeight);
-
-            //return resultBmp;
         }
     }
 }

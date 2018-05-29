@@ -64,26 +64,25 @@ namespace CHIP8Fun
         {
             opcode = FetchOpcode();
             DecodeOpcode(opcode);
-            // Execute Opcode
             // Update timers
             UpdateTimers();
         }
 
         private void UpdateTimers()
         {
-            if (delayTimer > 0)
+            if (DelayTimer > 0)
             {
-                delayTimer--;
+                DelayTimer--;
             }
 
-            if (soundTimer > 0)
+            if (SoundTimer > 0)
             {
-                if (soundTimer == 1)
+                if (SoundTimer == 1)
                 {
                     Console.WriteLine("BEEP!");
                 }
 
-                soundTimer--;
+                SoundTimer--;
             }
         }
 
@@ -151,32 +150,44 @@ namespace CHIP8Fun
                     cpu._7XNN(code);
                     break;
                 case 0x8000:
-                    cpu._8XY0(code);
+                {
+                    switch (code & 0x000F)
+                    {
+                        case 0x0000:
+                            cpu._8XY0(code);
+                            break;
+                        case 0x0001:
+                            cpu._8XY1(code);
+                            break;
+                        case 0x0002:
+                            cpu._8XY2(code);
+                            break;
+                        case 0x0003:
+                            cpu._8XY3(code);
+                            break;
+                        case 0x0004:
+                            cpu._8XY4(code);
+                            break;
+                        case 0x0005:
+                            cpu._8XY5(code);
+                            break;
+                        case 0x0006:
+                            cpu._8XY6(code);
+                            break;
+                        case 0x0007:
+                            cpu._8XY7(code);
+                            break;
+                        case 0x000E:
+                            cpu._8XYE(code);
+                            break;
+                        default:
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            break;
+                    }
+
                     break;
-                case 0x8001:
-                    cpu._8XY1(code);
-                    break;
-                case 0x8002:
-                    cpu._8XY2(code);
-                    break;
-                case 0x8003:
-                    cpu._8XY3(code);
-                    break;
-                case 0x8004:
-                    cpu._8XY4(code);
-                    break;
-                case 0x8005:
-                    cpu._8XY5(code);
-                    break;
-                case 0x8006:
-                    cpu._8XY6(code);
-                    break;
-                case 0x8007:
-                    cpu._8XY7(code);
-                    break;
-                case 0x800E:
-                    cpu._8XYE(code);
-                    break;
+                }
+
                 case 0x9000:
                     cpu._9XY0(code);
                     break;
@@ -192,41 +203,57 @@ namespace CHIP8Fun
                 case 0xD000:
                     cpu.DXYN(code);
                     break;
-                case 0xE09E:
-                    cpu.EX9E(code);
+                case 0xE000:
+                {
+                    switch (code & 0x000F)
+                    {
+                        case 0x000E:
+                            cpu.EX9E(code);
+                            break;
+                        case 0x0001:
+                            cpu.EXA1(code);
+                            break;
+                        default:
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            break;
+                    }
+
                     break;
-                case 0xE0A1:
-                    cpu.EXA1(code);
-                    break;
-                case 0xF007:
-                    cpu.FX07(code);
-                    break;
-                case 0xF00A:
-                    cpu.FX0A(code);
-                    break;
-                case 0xF015:
-                    cpu.FX15(code);
-                    break;
-                case 0xF018:
-                    cpu.FX18(code);
-                    break;
-                case 0xF01E:
-                    cpu.FX1E(code);
-                    break;
-                case 0xF029:
-                    cpu.FX29(code);
-                    break;
-                case 0xF033:
-                    cpu.FX33(code);
-                    break;
-                case 0xF055:
-                    cpu.FX55(code);
-                    break;
-                case 0xF065:
-                    cpu.FX65(code);
-                    break;
+                }
                 case 0xF000: // FX0A: Wait for key press, store key pressed in VX
-                    cpu.FX0A(code);
+                    switch (code & 0x0FF)
+                    {
+                        case 0x0007:
+                            cpu.FX07(code);
+                            break;
+                        case 0x000A:
+                            cpu.FX0A(code);
+                            break;
+                        case 0x0015:
+                            cpu.FX15(code);
+                            break;
+                        case 0x0018:
+                            cpu.FX18(code);
+                            break;
+                        case 0x001E:
+                            cpu.FX1E(code);
+                            break;
+                        case 0x0029:
+                            cpu.FX29(code);
+                            break;
+                        case 0x0033:
+                            cpu.FX33(code);
+                            break;
+                        case 0x0055:
+                            cpu.FX55(code);
+                            break;
+                        case 0x0065:
+                            cpu.FX65(code);
+                            break;
+                        default:
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            break;
+                    }
                     break;
 
                 //In some cases we can not rely solely on the first four bits to see what the opcode means.
@@ -328,6 +355,11 @@ namespace CHIP8Fun
         public byte[] V;
 
         /// <summary>
+        /// Constant value for the VF register.
+        /// </summary>
+        public readonly int VF = 15;
+
+        /// <summary>
         /// There is an Index register which can have a value from 0x000 to 0xFFF
         /// </summary>
         public short I;
@@ -352,12 +384,12 @@ namespace CHIP8Fun
         /// Interupts and hardware registers. The Chip 8 has none,
         /// but there are two timer registers that count at 60 Hz. When set above zero they will count down to zero.
         /// </summary>
-        private byte delayTimer;
+        public byte DelayTimer;
 
         /// <summary>
         /// The system’s buzzer sounds whenever the sound timer reaches zero.
         /// </summary>
-        private byte soundTimer;
+        public byte SoundTimer;
 
         /// <summary>
         /// The stack is used to remember the current location before a jump is performed.

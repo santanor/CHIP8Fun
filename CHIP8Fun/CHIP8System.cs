@@ -48,8 +48,6 @@ namespace CHIP8Fun
             }
 
             cpu = new Opcodes(this);
-            gpu = new GPU(image,64,32);
-
 
             // Reset timers
         }
@@ -68,22 +66,36 @@ namespace CHIP8Fun
             UpdateTimers();
         }
 
+        /// <summary>
+        /// The timers have to work at 60Hz, so we'll simulate that by counting the miliseconds since
+        /// the last update
+        /// </summary>
         private void UpdateTimers()
         {
-            if (DelayTimer > 0)
-            {
-                DelayTimer--;
-            }
+            var currentTime = (DateTime.Now - DateTime.MinValue).TotalMilliseconds;
+            var milisecondsSinceLastUpdate = currentTime - timerCounter;
 
-            if (SoundTimer > 0)
+            //more than 1/60th of a second passed
+            if (milisecondsSinceLastUpdate > 15)
             {
-                if (SoundTimer == 1)
+                timerCounter = currentTime;
+                if (DelayTimer > 0)
                 {
-                    Console.WriteLine("BEEP!");
+                    DelayTimer--;
                 }
 
-                SoundTimer--;
+                if (SoundTimer > 0)
+                {
+                    if (SoundTimer == 1)
+                    {
+                        Console.WriteLine("BEEP!");
+                    }
+
+                    SoundTimer--;
+                }
             }
+
+
         }
 
         /// <summary>
@@ -411,7 +423,7 @@ namespace CHIP8Fun
 
         private readonly Opcodes cpu;
 
-        public readonly GPU gpu;
+        private double timerCounter;
 
         #region fontset
 

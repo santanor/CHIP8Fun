@@ -23,7 +23,7 @@ namespace CHIP8Fun
         public void Run()
         {// Initialize the Chip8 system and load the game into the memory
             chip8 = new CHIP8System(backingImage);
-            chip8.LoadProgram("Pong.ch8");
+            chip8.LoadProgram("Tetris.ch8");
 
             // Emulation loop
             while (true)
@@ -38,10 +38,6 @@ namespace CHIP8Fun
                     OnNewFrame?.Invoke(newFrame);
                     chip8.V[15] = 0;
                 }
-
-
-                // Store key press state (Press and Release)
-                chip8.SetKeys();
             }
         }
 
@@ -126,6 +122,77 @@ namespace CHIP8Fun
                     ;
                     break;
             }
+        }
+
+        public static void OnKeyReleased(object sender, KeyEventArgs keyEventArgs)
+        {
+            switch (keyEventArgs.Key)
+            {
+                case Key.D1:
+                    chip8.Keys[0] = 0;
+                    break;
+                case Key.D2:
+                    chip8.Keys[1] = 0;
+                    ;
+                    break;
+                case Key.D3:
+                    chip8.Keys[2] = 0;
+                    ;
+                    break;
+                case Key.D4:
+                    chip8.Keys[3] = 0;
+                    ;
+                    break;
+                case Key.Q:
+                    chip8.Keys[4] = 0;
+                    ;
+                    break;
+                case Key.W:
+                    chip8.Keys[5] = 0;
+                    ;
+                    break;
+                case Key.E:
+                    chip8.Keys[6] = 0;
+                    ;
+                    break;
+                case Key.R:
+                    chip8.Keys[7] = 0;
+                    ;
+                    break;
+                case Key.A:
+                    chip8.Keys[8] = 0;
+                    ;
+                    break;
+                case Key.S:
+                    chip8.Keys[9] = 0;
+                    ;
+                    break;
+                case Key.D:
+                    chip8.Keys[10] = 0;
+                    ;
+                    break;
+                case Key.F:
+                    chip8.Keys[11] = 0;
+                    ;
+                    break;
+                case Key.Z:
+                    chip8.Keys[12] = 0;
+                    ;
+                    break;
+                case Key.X:
+                    chip8.Keys[13] = 0;
+                    ;
+                    break;
+                case Key.C:
+                    chip8.Keys[14] = 0;
+                    ;
+                    break;
+                case Key.V:
+                    chip8.Keys[15] = 0;
+                    ;
+                    break;
+            }
+
         }
     }
 }

@@ -33,6 +33,7 @@ namespace CHIP8Fun.WPF
             }
 
             KeyDown += Emulator.OnKeyPressed;
+            KeyUp += Emulator.OnKeyReleased;
             emulator.OnNewFrame += OnImageChanged;
         }
 

@@ -13,10 +13,14 @@ namespace CHIP8Fun
     {
         public delegate void NewFrame(Bitmap img);
 
+        public delegate void DebugEvent();
+
         public NewFrame OnNewFrame;
-        public static CHIP8System Chip8;
+        public DebugEvent OnDebugTick;
+        public CHIP8System Chip8;
         private Bitmap backingImage;
         public bool IsRunning;
+        private double timerCounter;
 
         /// <summary>
         /// Emulator Loop
@@ -40,6 +44,17 @@ namespace CHIP8Fun
                     OnNewFrame?.Invoke(newFrame);
                     Chip8.V[15] = 0;
                 }
+
+                //Notifies the debugger to do its thing
+                var currentTime = (DateTime.Now - DateTime.MinValue).TotalMilliseconds;
+                var milisecondsSinceLastUpdate = currentTime - timerCounter;
+
+                //more than 1/60th of a second passed
+                if (milisecondsSinceLastUpdate > 50)
+                {
+                    timerCounter = currentTime;
+                    OnDebugTick?.Invoke();
+                }
             }
         }
 
@@ -56,7 +71,7 @@ namespace CHIP8Fun
             return bmp;
         }
 
-        public static void OnKeyPressed(object sender, KeyEventArgs keyEventArgs)
+        public void OnKeyPressed(object sender, KeyEventArgs keyEventArgs)
         {
             switch (keyEventArgs.Key)
             {
@@ -126,7 +141,7 @@ namespace CHIP8Fun
             }
         }
 
-        public static void OnKeyReleased(object sender, KeyEventArgs keyEventArgs)
+        public void OnKeyReleased(object sender, KeyEventArgs keyEventArgs)
         {
             switch (keyEventArgs.Key)
             {

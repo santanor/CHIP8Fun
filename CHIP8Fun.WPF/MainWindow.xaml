@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Width="860" Height="480">
+        Title="MainWindow" Width="1000" Height="480">
         <DockPanel HorizontalAlignment="Left">
             <Image
                 Name="bmp"
@@ -12,7 +12,7 @@
                 MinHeight="160"
                 MinWidth="320"
                 MaxHeight="320"
-                MaxWidth="640 " ></Image>
+                MaxWidth="480"></Image>
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
 
             <!--For the debugger-->
@@ -58,17 +58,13 @@
                              HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
                 </Grid>
 
-                <!--Registers-->
-                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <Label Content="Registers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-                <ScrollViewer IsDeferredScrollingEnabled="True">
-                    <Grid Name="RegistersGrid">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                    </Grid>
-                </ScrollViewer>
+                <!--Registers view-->
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <StackPanel>
+                    <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    <Label Content="Registers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+                    <ListView Name="RegistersGrid" Height="250" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
+                </StackPanel>
             </StackPanel>
 
             <!--Memory view-->
@@ -76,11 +72,23 @@
             <StackPanel>
                 <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                 <Label Content="Memory" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-                <ScrollViewer IsDeferredScrollingEnabled="True">
-                    <ListView Name="MemoryGrid">
-                    </ListView>
-                </ScrollViewer>
+                <ListView Name="MemoryGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
             </StackPanel>
 
-            </DockPanel>
+            <!--Stack view-->
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <StackPanel>
+                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Label Content="Stack" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+                <ListView Name="StackGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
+            </StackPanel>
+
+            <!--Keys view-->
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <StackPanel>
+                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Label Content="Keys" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+                <ListView Name="KeysGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
+            </StackPanel>
+    </DockPanel>
 </Window>

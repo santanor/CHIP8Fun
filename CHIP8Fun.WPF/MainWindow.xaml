@@ -4,10 +4,71 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="480" Width="640">
-    <Grid>
-        <Image
-            Name="bmp"
-            RenderOptions.BitmapScalingMode="NearestNeighbor"></Image>
-    </Grid>
+        Title="MainWindow" Width="1280" Height="1024">
+        <DockPanel HorizontalAlignment="Left">
+            <Image
+                Name="bmp"
+                RenderOptions.BitmapScalingMode="NearestNeighbor"
+                MinHeight="160"
+                MinWidth="320"
+                MaxHeight="320"
+                MaxWidth="640 " ></Image>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+            <!--For the debugger-->
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
+                <Label Content="asdf"></Label>
+
+                <!-- Heres where the values of the PC, I and registers go-->
+                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Label Content="CPU inspector" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label><Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                             <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <!--PC-->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="PC"></TextBlock>
+                    <TextBox Name="PCValue" Grid.Row="0" Grid.Column="1" Text="PC"
+                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+
+                    <!--I-->
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="I"></TextBlock>
+                    <TextBox Name="IValue" Grid.Row="1" Grid.Column="1" Text="I"
+                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+
+                    <!--SP-->
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="SP"></TextBlock>
+                    <TextBox Name="SPValue" Grid.Row="2" Grid.Column="1" Text="SP"
+                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+
+                    <!--Delay timer-->
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="DELAY"></TextBlock>
+                    <TextBox Name="DelayTimerValue" Grid.Row="3" Grid.Column="1" Text="DELAY"
+                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+
+                    <!--Sound timer-->
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="I"></TextBlock>
+                    <TextBox Name="SoundtimerValue" Grid.Row="4" Grid.Column="1" Text="SOUND"
+                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+                </Grid>
+
+                <!--Registers-->
+                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Label Content="Registers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+                <Grid Name="RegistersGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </StackPanel>
+        </DockPanel>
 </Window>

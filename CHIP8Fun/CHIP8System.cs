@@ -36,11 +36,6 @@ namespace CHIP8Fun
             I = 0; // Reset index register
             Sp = 0; // Reset stack pointer
 
-            // Clear display
-            // Clear stack
-            // Clear registers V0-VF
-            // Clear memory
-
             // Load fontset
             for (var i = 0; i < 80; ++i)
             {
@@ -62,7 +57,6 @@ namespace CHIP8Fun
         {
             opcode = FetchOpcode();
             DecodeOpcode(opcode);
-            // Update timers
             UpdateTimers();
         }
 

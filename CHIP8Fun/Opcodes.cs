@@ -53,7 +53,7 @@ namespace CHIP8Fun
         {
             s.Sp--;
             s.Pc = s.Stack[s.Sp];
-            s.Stack[s.Sp] = 0;
+            s.Pc += 2;
         }
 
         /// <summary>
@@ -82,8 +82,8 @@ namespace CHIP8Fun
                 return;
             }
 
-            var label = code & 0xFFF; //get the label address from the opcode
-            s.Stack[s.Sp] = (short)(s.Pc + 2); //backup the current PC in the stack
+            var label = code & 0x0FFF; //get the label address from the opcode
+            s.Stack[s.Sp] = s.Pc; //backup the current PC in the stack
             s.Sp++; //Increment the stack pointer to an empty position
             s.Pc = (short)label; //Move the PC to the label
         }
@@ -163,8 +163,8 @@ namespace CHIP8Fun
         {
             Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
-            var nn = code & 0x00FF;
-            s.V[x] = (byte)nn;
+            var nn = (byte)(code & 0x00FF);
+            s.V[x] = nn;
             s.Pc += 2;
         }
 
@@ -212,14 +212,14 @@ namespace CHIP8Fun
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
-            s.V[x] = (byte)(s.V[x] | s.V[y]);
+            s.V[x] |= s.V[y];
 
             s.Pc += 2;
         }
 
         /// <summary>
         /// BitOp Vx=Vx&Vy
-        /// Sets VX to VX and VY. (Bitwise AND operation) VF is reset to 0.
+        /// Sets VX to VX and VY. (Bitwise AND operation).
         /// </summary>
         /// <param name="code"></param>
         /// <exception cref="NotImplementedException"></exception>
@@ -229,28 +229,23 @@ namespace CHIP8Fun
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
-            s.V[x] = (byte)(s.V[x] & s.V[y]);
-
-            s.V[s.VF] = 0;
+            s.V[x] &= s.V[y];
 
             s.Pc += 2;
         }
 
         /// <summary>
         /// BitOp Vx=Vx^Vy
-        /// Sets VX to VX xor VY. VF is reset to 0.
+        /// Sets VX to VX xor VY.
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
         public void _8XY3(short code)
         {
             Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
-            s.V[x] = (byte)(s.V[x] ^ s.V[y]);
-
-            s.V[s.VF] = 0;
+            s.V[x] ^= s.V[y];
 
             s.Pc += 2;
         }
@@ -260,7 +255,6 @@ namespace CHIP8Fun
         /// Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
         public void _8XY4(short code)
         {
             Debug.WriteLine($"Executing: {code:x}");
@@ -279,14 +273,13 @@ namespace CHIP8Fun
         /// VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
         public void _8XY5(short code)
         {
             Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
-            s.V[s.VF] = s.V[x] < s.V[y] ? (byte)1 : (byte)0;
+            s.V[s.VF] = s.V[x] < s.V[y] ? (byte)0 : (byte)1;
 
             s.V[x] = (byte)(s.V[x] - s.V[y]);
 
@@ -296,19 +289,17 @@ namespace CHIP8Fun
         /// <summary>
         /// BitOp	Vx=Vy=Vy>>1
         /// Shifts VY right by one and stores the result to VX (VY remains unchanged).
-        /// VF is set to the value of the least significant bit of VY before the shift.[2]
+        /// VF is set to the value of the least significant bit of VY before the shift.
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
         public void _8XY6(short code)
         {
             Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
+            s.V[x] = (byte)(s.V[x] >> 1);
             s.V[s.VF] = (byte)(s.V[x] & 0x1);
-            var cachedVy = s.V[y];
-            s.V[x] = (byte)(cachedVy >> 1);
 
             s.Pc += 2;
         }
@@ -318,14 +309,13 @@ namespace CHIP8Fun
         /// Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
         public void _8XY7(short code)
         {
             Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
-            s.V[s.VF] = s.V[x] > s.V[y] ? (byte)1 : (byte)0;
+            s.V[s.VF] = s.V[x] > s.V[y] ? (byte)0 : (byte)1;
 
             s.V[x] = (byte)(s.V[y] - s.V[x]);
 
@@ -345,9 +335,8 @@ namespace CHIP8Fun
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
-            s.V[s.VF] = (byte)(s.V[y] & 0x1);
-            var cachedVy = s.V[y];
-            s.V[x] = (byte)(cachedVy << 1);
+            s.V[s.VF] = (byte)(s.V[x] >> 7);
+            s.V[x] <<= 1;
 
             s.Pc += 2;
         }
@@ -456,7 +445,7 @@ namespace CHIP8Fun
             Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
 
-            if (s.Keys[s.V[x]] == 1)
+            if (s.Keys[s.V[x]] != 0)
             {
                 s.Pc += 4;
             }
@@ -553,13 +542,15 @@ namespace CHIP8Fun
 
         /// <summary>
         /// MEM	I +=Vx
-        /// Adds VX to I.[3]
+        /// Adds VX to I.
         /// </summary>
         /// <param name="code"></param>
         public void FX1E(short code)
         {
             Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
+
+            s.V[s.VF] = s.I + s.V[(code & 0x0F00) >> 8] > 0xFFF ? (byte)1 : (byte)0;
 
             s.I += s.V[x];
 
@@ -598,8 +589,8 @@ namespace CHIP8Fun
             var x = (code & 0xF00) >> 8;
             var value = s.V[x];
             s.Memory[s.I] = (byte)(value / 100);
-            s.Memory[s.I + 1] = (byte)(value / 10 % 10);
-            s.Memory[s.I + 2] = (byte)(value % 100 % 10);
+            s.Memory[s.I + 1] = (byte)((value / 10) % 10);
+            s.Memory[s.I + 2] = (byte)((value % 100) % 10);
             s.Pc += 2;
         }
 
@@ -615,9 +606,10 @@ namespace CHIP8Fun
 
             for (var i = 0; i <= x; i++)
             {
-                s.Memory[s.I] = s.V[i];
-                s.I++;
+                s.Memory[s.I + i] = s.V[i];
             }
+
+            s.I += (short)(x+1);
 
             s.Pc += 2;
         }
@@ -635,9 +627,10 @@ namespace CHIP8Fun
 
             for (var i = 0; i <= x; i++)
             {
-                s.V[i] = s.Memory[s.I];
-                s.I++;
+                s.V[i] = s.Memory[s.I + i];
             }
+
+            s.I += (short)(x + 1);
 
             s.Pc += 2;
         }

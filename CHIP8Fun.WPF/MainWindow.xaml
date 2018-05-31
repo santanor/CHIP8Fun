@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Width="1280" Height="1024">
+        Title="MainWindow" Width="860" Height="480">
         <DockPanel HorizontalAlignment="Left">
             <Image
                 Name="bmp"
@@ -17,11 +17,9 @@
 
             <!--For the debugger-->
             <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
-                <Label Content="asdf"></Label>
-
                 <!-- Heres where the values of the PC, I and registers go-->
                 <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <Label Content="CPU inspector" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label><Grid >
+                <Label Content="CPU" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label><Grid >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
@@ -55,7 +53,7 @@
                              HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
 
                     <!--Sound timer-->
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="I"></TextBlock>
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="SOUND"></TextBlock>
                     <TextBox Name="SoundtimerValue" Grid.Row="4" Grid.Column="1" Text="SOUND"
                              HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
                 </Grid>
@@ -63,12 +61,26 @@
                 <!--Registers-->
                 <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                 <Label Content="Registers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-                <Grid Name="RegistersGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                </Grid>
+                <ScrollViewer IsDeferredScrollingEnabled="True">
+                    <Grid Name="RegistersGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ScrollViewer>
             </StackPanel>
-        </DockPanel>
+
+            <!--Memory view-->
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <StackPanel>
+                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Label Content="Memory" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
+                <ScrollViewer IsDeferredScrollingEnabled="True">
+                    <ListView Name="MemoryGrid">
+                    </ListView>
+                </ScrollViewer>
+            </StackPanel>
+
+            </DockPanel>
 </Window>

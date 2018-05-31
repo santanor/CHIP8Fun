@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -16,6 +17,7 @@ namespace CHIP8Fun.WPF
     {
         private Emulator emulator;
         private TextBox[] registersValues;
+        private TextBox[] memoryValues;
 
         public MainWindow()
         {
@@ -34,21 +36,46 @@ namespace CHIP8Fun.WPF
             {}
 
             InitializeRegistersGrid();
+            InitializeMemoryGrid();
 
             KeyDown += Emulator.OnKeyPressed;
             KeyUp += Emulator.OnKeyReleased;
             emulator.OnNewFrame += OnImageChanged;
         }
 
+        /// <summary>
+        /// Initializes the grid that holds the data for the memory
+        /// </summary>
+        private void InitializeMemoryGrid()
+        {
+            memoryValues = new TextBox[Emulator.Chip8.Memory.Length];
+
+            for (var i = 0; i < memoryValues.Length; i++)
+            {
+                //var memPosName = new Label(){Content = i.ToString()};
+
+                var memValue = new TextBox()
+                {
+                    IsEnabled = false,
+                    Text = i.ToString()
+                };
+
+                memoryValues[i] = memValue;
+            }
+            MemoryGrid.ItemsSource = memoryValues;
+        }
+
+        /// <summary>
+        /// Initializes the grid that holds the data for the registers
+        /// </summary>
         private void InitializeRegistersGrid()
         {
             registersValues = new TextBox[Emulator.Chip8.V.Length];
             for (var i = 0; i < Emulator.Chip8.V.Length; i++)
             {
-                var rowDef = new RowDefinition();
-                RegistersGrid.RowDefinitions.Add(rowDef);
+                RegistersGrid.RowDefinitions.Add(new RowDefinition());
 
-                var regName = new TextBlock {Text = $"V{i}"};
+                var regName = new Label(){Content = $"V{i}"};
                 Grid.SetColumn(regName, 0);
                 Grid.SetRow(regName, i);
 
@@ -66,20 +93,32 @@ namespace CHIP8Fun.WPF
             }
         }
 
+        /// <summary>
+        /// Refreshes the image on the WPF application
+        /// </summary>
+        /// <param name="bmpSource"></param>
         private void OnImageChanged(Bitmap bmpSource)
         {
-            bmp.Dispatcher.Invoke(() =>
+            try
             {
-                var ms = new MemoryStream();
-                bmpSource.Save(ms, ImageFormat.Bmp);
-                var image = new BitmapImage();
-                image.BeginInit();
-                ms.Seek(0, SeekOrigin.Begin);
-                image.StreamSource = ms;
-                image.EndInit();
-                image.Freeze();
-                bmp.Source = image;
-            });
+                bmp.Dispatcher.Invoke(() =>
+                {
+                    var ms = new MemoryStream();
+                    bmpSource.Save(ms, ImageFormat.Bmp);
+                    var image = new BitmapImage();
+                    image.BeginInit();
+                    ms.Seek(0, SeekOrigin.Begin);
+                    image.StreamSource = ms;
+                    image.EndInit();
+                    image.Freeze();
+                    bmp.Source = image;
+                });
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Thank you for playing Wing Commander");
+            }
+
         }
     }
 }

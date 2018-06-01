@@ -25,6 +25,7 @@ namespace CHIP8Fun.WPF
         {
             InitializeComponent();
 
+            //Starts the emulator
             var thread = new Thread(() =>
             {
                 emulator = new Emulator();
@@ -36,13 +37,16 @@ namespace CHIP8Fun.WPF
             //Wait for the emulator to be available
             while (emulator?.IsRunning != true)
             {
+                Thread.Sleep(5);
             }
 
-            InitializeRegistersGrid();
-            InitializeMemoryGrid();
-            InitializeStackGrid();
-            InitializeKeysGrid();
+            //Build the UI to display the debug data
+            InitializeDebugDataGrid(ref RegistersGrid, ref registersValues, ref emulator.Chip8.V);
+            InitializeDebugDataGrid(ref MemoryGrid, ref memoryValues, ref emulator.Chip8.Memory);
+            InitializeDebugDataGrid(ref KeysGrid, ref keyValues, ref emulator.Chip8.Keys);
+            InitializeDebugDataGrid(ref StackGrid, ref stackValues, ref emulator.Chip8.Stack);
 
+            //Hook the events
             KeyDown += emulator.OnKeyPressed;
             KeyUp += emulator.OnKeyReleased;
             emulator.OnNewFrame += OnImageChanged;
@@ -50,21 +54,26 @@ namespace CHIP8Fun.WPF
         }
 
         /// <summary>
-        /// Initializes the grid that holds the data for the keys
+        /// For each value, creates a grid with two columns, the index and the value. It then
+        /// adds each grid to the listView passed as a parameter
         /// </summary>
-        private void InitializeKeysGrid()
+        /// <param name="component"></param>
+        /// <param name="gridValues"></param>
+        /// <param name="data"></param>
+        /// <typeparam name="T"></typeparam>
+        private void InitializeDebugDataGrid<T>(ref ListView component, ref TextBox[] gridValues, ref T[] data)
         {
-            keyValues = new TextBox[emulator.Chip8.Keys.Length];
+            gridValues = new TextBox[data.Length];
 
-            for (var i = 0; i < keyValues.Length; i++)
+            for (var i = 0; i < gridValues.Length; i++)
             {
-                var keyName = new Label
+                var dataName = new Label
                 {
                     Content = i.ToString(),
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Center
                 };
-                var keyValue = new TextBox
+                var dataValue = new TextBox
                 {
                     IsEnabled = false,
                     Text = i.ToString(),
@@ -72,7 +81,7 @@ namespace CHIP8Fun.WPF
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                keyValues[i] = keyValue;
+                gridValues[i] = dataValue;
 
                 var grid = new Grid();
 
@@ -85,156 +94,19 @@ namespace CHIP8Fun.WPF
                     Width = new GridLength(50)
                 });
 
-                Grid.SetColumn(keyName, 0);
-                Grid.SetColumn(keyValue, 1);
+                Grid.SetColumn(dataName, 0);
+                Grid.SetColumn(dataValue, 1);
 
-                grid.Children.Add(keyName);
-                grid.Children.Add(keyValue);
+                grid.Children.Add(dataName);
+                grid.Children.Add(dataValue);
 
-                KeysGrid.Items.Add(grid);
-            }
-        }
-
-        /// <summary>
-        /// Initializes the grid that holds the data for the stack
-        /// </summary>
-        private void InitializeStackGrid()
-        {
-            stackValues = new TextBox[emulator.Chip8.Stack.Length];
-
-            for (var i = 0; i < stackValues.Length; i++)
-            {
-                var stackName = new Label
-                {
-                    Content = i.ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                var stackValue = new TextBox
-                {
-                    IsEnabled = false,
-                    Text = i.ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                stackValues[i] = stackValue;
-
-                var grid = new Grid();
-
-                grid.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(40)
-                });
-                grid.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(50)
-                });
-
-                Grid.SetColumn(stackName, 0);
-                Grid.SetColumn(stackValue, 1);
-
-                grid.Children.Add(stackName);
-                grid.Children.Add(stackValue);
-
-                StackGrid.Items.Add(grid);
-            }
-        }
-
-        /// <summary>
-        /// Initializes the grid that holds the data for the memory
-        /// </summary>
-        private void InitializeMemoryGrid()
-        {
-            memoryValues = new TextBox[emulator.Chip8.Memory.Length];
-
-            for (var i = 0; i < memoryValues.Length; i++)
-            {
-                var memName = new Label
-                {
-                    Content = i.ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                var memValue = new TextBox
-                {
-                    IsEnabled = false,
-                    Text = i.ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                memoryValues[i] = memValue;
-
-                var grid = new Grid();
-
-                grid.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(40)
-                });
-                grid.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(50)
-                });
-
-                Grid.SetColumn(memName, 0);
-                Grid.SetColumn(memValue, 1);
-
-                grid.Children.Add(memName);
-                grid.Children.Add(memValue);
-
-                MemoryGrid.Items.Add(grid);
-            }
-        }
-
-        /// <summary>
-        /// Initializes the grid that holds the data for the registers
-        /// </summary>
-        private void InitializeRegistersGrid()
-        {
-            registersValues = new TextBox[emulator.Chip8.V.Length];
-
-            for (var i = 0; i < registersValues.Length; i++)
-            {
-                var regName = new Label
-                {
-                    Content = $"V{i}",
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                var regValue = new TextBox
-                {
-                    IsEnabled = false,
-                    Text = i.ToString(),
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                registersValues[i] = regValue;
-
-                var grid = new Grid();
-
-                grid.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(40)
-                });
-                grid.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(50)
-                });
-
-                Grid.SetColumn(regName, 0);
-                Grid.SetColumn(regValue, 1);
-
-                grid.Children.Add(regName);
-                grid.Children.Add(regValue);
-
-                RegistersGrid.Items.Add(grid);
+                component.Items.Add(grid);
             }
         }
 
         /// <summary>
         /// Refreshes the image on the WPF application
+        /// We have to use the Dispatcher because we're accesing the UI thread from a worker thread
         /// </summary>
         /// <param name="bmpSource"></param>
         private void OnImageChanged(Bitmap bmpSource)
@@ -262,6 +134,7 @@ namespace CHIP8Fun.WPF
 
         /// <summary>
         /// Refreshes all the grids that hold the emulator data
+        /// We have to use the Dispatcher because we're accesing the UI thread from a worker thread
         /// </summary>
         private void OnRefreshDebugGrids()
         {
@@ -269,25 +142,10 @@ namespace CHIP8Fun.WPF
             {
                 Dispatcher.Invoke(() =>
                 {
-                    for (var i = 0; i < memoryValues.Length; i++)
-                    {
-                        memoryValues[i].Text = emulator.Chip8.Memory[i].ToString("X");
-                    }
-
-                    for (var i = 0; i < keyValues.Length; i++)
-                    {
-                        keyValues[i].Text = emulator.Chip8.Keys[i].ToString("X");
-                    }
-
-                    for (var i = 0; i < stackValues.Length; i++)
-                    {
-                        stackValues[i].Text = emulator.Chip8.Stack[i].ToString();
-                    }
-
-                    for (var i = 0; i < registersValues.Length; i++)
-                    {
-                        registersValues[i].Text = emulator.Chip8.V[i].ToString();
-                    }
+                    RefreshDebugDataGrid(ref memoryValues, ref emulator.Chip8.Memory);
+                    RefreshDebugDataGrid(ref keyValues, ref emulator.Chip8.Keys);
+                    RefreshDebugDataGrid(ref stackValues, ref emulator.Chip8.Stack);
+                    RefreshDebugDataGrid(ref registersValues, ref emulator.Chip8.V);
 
                     PCValue.Text = emulator.Chip8.Pc.ToString();
                     SPValue.Text = emulator.Chip8.Sp.ToString();
@@ -300,7 +158,24 @@ namespace CHIP8Fun.WPF
             {
                 Debug.WriteLine("Thank you for playing Wing Commander");
             }
+        }
 
+
+        /// <summary>
+        /// Only updates the UI if the value has changed
+        /// </summary>
+        /// <param name="gridValues"></param>
+        /// <param name="data"></param>
+        /// <typeparam name="T"></typeparam>
+        private void RefreshDebugDataGrid<T>(ref TextBox[] gridValues, ref T[] data)
+        {
+            for (var i = 0; i < data.Length; i++)
+            {
+                if (gridValues[i].Text != data[i].ToString())
+                {
+                    gridValues[i].Text = data[i].ToString();
+                }
+            }
         }
     }
 }

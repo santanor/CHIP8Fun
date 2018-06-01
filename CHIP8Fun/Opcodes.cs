@@ -63,7 +63,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _1NNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var address = code & 0xFFF;
             s.Pc = (short)address;
         }
@@ -75,7 +74,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _2NNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             if (s.Sp >= s.Stack.Length)
             {
                 Debug.WriteLine($"Stack Overflow! opcode{code:x}");
@@ -96,7 +94,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _3XNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
 
@@ -118,7 +115,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _4XNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
 
@@ -140,7 +136,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _5XY0(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -161,7 +156,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _6XNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var nn = (byte)(code & 0x00FF);
             s.V[x] = nn;
@@ -175,7 +169,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _7XNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
 
@@ -191,7 +184,6 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY0(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -208,7 +200,6 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY1(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -225,7 +216,6 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XY2(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -241,7 +231,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _8XY3(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -257,7 +246,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _8XY4(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -275,7 +263,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _8XY5(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -294,7 +281,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _8XY6(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -311,7 +297,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _8XY7(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -331,7 +316,6 @@ namespace CHIP8Fun
         /// <exception cref="NotImplementedException"></exception>
         public void _8XYE(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -349,7 +333,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void _9XY0(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
 
@@ -370,7 +353,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void ANNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             s.I = (short)(code & 0x0FFF);
             s.Pc += 2;
         }
@@ -382,7 +364,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void BNNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var address = (short)(code & 0x0FFF);
             address += s.V[0];
 
@@ -396,7 +377,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void CXNN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
 
@@ -417,8 +397,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void DXYN(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
-
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
             var N = code & 0x000F;
@@ -442,7 +420,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void EX9E(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
 
             if (s.Keys[s.V[x]] != 0)
@@ -463,7 +440,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void EXA1(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
 
             if (s.Keys[s.V[x]] == 0)
@@ -483,7 +459,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX07(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
 
             s.V[x] = s.DelayTimer;
@@ -499,7 +474,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX0A(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0x0F00) >> 8;
             //Blocking operation. Waits for a key to be pressed
             var key = s.AnyKeyPressed();
@@ -517,7 +491,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX15(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
 
             s.DelayTimer = s.V[x];
@@ -532,7 +505,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX18(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
 
             s.SoundTimer = s.V[x];
@@ -547,7 +519,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX1E(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
 
             s.V[s.VF] = s.I + s.V[(code & 0x0F00) >> 8] > 0xFFF ? (byte)1 : (byte)0;
@@ -565,7 +536,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX29(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
 
             s.I = (byte)(s.V[x] * 0x5);
@@ -585,12 +555,11 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX33(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
             var value = s.V[x];
             s.Memory[s.I] = (byte)(value / 100);
-            s.Memory[s.I + 1] = (byte)((value / 10) % 10);
-            s.Memory[s.I + 2] = (byte)((value % 100) % 10);
+            s.Memory[s.I + 1] = (byte)(value / 10 % 10);
+            s.Memory[s.I + 2] = (byte)(value % 100 % 10);
             s.Pc += 2;
         }
 
@@ -601,7 +570,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX55(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
 
             for (var i = 0; i <= x; i++)
@@ -609,7 +577,7 @@ namespace CHIP8Fun
                 s.Memory[s.I + i] = s.V[i];
             }
 
-            s.I += (short)(x+1);
+            s.I += (short)(x + 1);
 
             s.Pc += 2;
         }
@@ -622,7 +590,6 @@ namespace CHIP8Fun
         /// <param name="code"></param>
         public void FX65(short code)
         {
-            Debug.WriteLine($"Executing: {code:x}");
             var x = (code & 0xF00) >> 8;
 
             for (var i = 0; i <= x; i++)

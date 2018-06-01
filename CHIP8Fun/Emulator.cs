@@ -1,32 +1,55 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Color = System.Drawing.Color;
 
 namespace CHIP8Fun
 {
     public class Emulator
     {
-        public delegate void NewFrame(Bitmap img);
-
         public delegate void DebugEvent();
 
-        public NewFrame OnNewFrame;
-        public DebugEvent OnDebugTick;
-        public CHIP8System Chip8;
+        public delegate void NewFrame(Bitmap img);
+
         private Bitmap backingImage;
+        public CHIP8System Chip8;
         public bool IsRunning;
+
+        /// <summary>
+        /// Map of the keys used by the emulator
+        /// </summary>
+        private IDictionary<Key, int> keyMap = new Dictionary<Key, int>
+        {
+            {Key.D1, 0},
+            {Key.D2, 1},
+            {Key.D3, 2},
+            {Key.D4, 3},
+            {Key.Q, 4},
+            {Key.W, 5},
+            {Key.E, 6},
+            {Key.R, 7},
+            {Key.A, 8},
+            {Key.S, 9},
+            {Key.D, 10},
+            {Key.F, 11},
+            {Key.Z, 12},
+            {Key.X, 13},
+            {Key.C, 14},
+            {Key.V, 15}
+        };
+
+        public DebugEvent OnDebugTick;
+
+        public NewFrame OnNewFrame;
         private double timerCounter;
 
         /// <summary>
         /// Emulator Loop
         /// </summary>
         public void Run()
-        {// Initialize the Chip8 system and load the game into the memory
+        {
+            // Initialize the Chip8 system and load the game into the memory
             Chip8 = new CHIP8System(backingImage);
             Chip8.LoadProgram("Tetris.ch8");
             IsRunning = true;
@@ -50,7 +73,7 @@ namespace CHIP8Fun
                 var milisecondsSinceLastUpdate = currentTime - timerCounter;
 
                 //more than 1/60th of a second passed
-                if (milisecondsSinceLastUpdate > 50)
+                if (milisecondsSinceLastUpdate > 20)
                 {
                     timerCounter = currentTime;
                     OnDebugTick?.Invoke();
@@ -58,158 +81,46 @@ namespace CHIP8Fun
             }
         }
 
+        /// <summary>
+        /// Presents the backBuffer to the displaying image in the frontend
+        /// </summary>
+        /// <returns></returns>
         private Bitmap DrawGraphics()
         {
-            var bmp = new Bitmap(64,32);
+            var bmp = new Bitmap(64, 32);
             for (var i = 0; i < 64; i++)
             {
                 for (var j = 0; j < 32; j++)
                 {
-                    bmp.SetPixel(i,j, Chip8.Gfx[i,j] ? Color.White : Color.Black);
+                    bmp.SetPixel(i, j, Chip8.Gfx[i, j] ? Color.White : Color.Black);
                 }
             }
+
             return bmp;
         }
 
+        /// <summary>
+        /// If the key pressed is in the keymap for the emulator, assigns the value of the key to the cpu's register
+        /// </summary>
         public void OnKeyPressed(object sender, KeyEventArgs keyEventArgs)
         {
-            switch (keyEventArgs.Key)
+            if (keyMap.ContainsKey(keyEventArgs.Key))
             {
-                case Key.D1:
-                    Chip8.Keys[0] = Convert.ToByte(keyEventArgs.Key);
-                    break;
-                case Key.D2:
-                    Chip8.Keys[1] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.D3:
-                    Chip8.Keys[2] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.D4:
-                    Chip8.Keys[3] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.Q:
-                    Chip8.Keys[4] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.W:
-                    Chip8.Keys[5] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.E:
-                    Chip8.Keys[6] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.R:
-                    Chip8.Keys[7] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.A:
-                    Chip8.Keys[8] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.S:
-                    Chip8.Keys[9] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.D:
-                    Chip8.Keys[10] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.F:
-                    Chip8.Keys[11] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.Z:
-                    Chip8.Keys[12] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.X:
-                    Chip8.Keys[13] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.C:
-                    Chip8.Keys[14] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
-                case Key.V:
-                    Chip8.Keys[15] = Convert.ToByte(keyEventArgs.Key);
-                    ;
-                    break;
+                Chip8.Keys[keyMap[keyEventArgs.Key]] = (byte)keyEventArgs.Key;
             }
         }
 
+        /// <summary>
+        /// If the key released is in the keymap for the emulator, clears the value on the cpu's register
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="keyEventArgs"></param>
         public void OnKeyReleased(object sender, KeyEventArgs keyEventArgs)
         {
-            switch (keyEventArgs.Key)
+            if (keyMap.ContainsKey(keyEventArgs.Key))
             {
-                case Key.D1:
-                    Chip8.Keys[0] = 0;
-                    break;
-                case Key.D2:
-                    Chip8.Keys[1] = 0;
-                    ;
-                    break;
-                case Key.D3:
-                    Chip8.Keys[2] = 0;
-                    ;
-                    break;
-                case Key.D4:
-                    Chip8.Keys[3] = 0;
-                    ;
-                    break;
-                case Key.Q:
-                    Chip8.Keys[4] = 0;
-                    ;
-                    break;
-                case Key.W:
-                    Chip8.Keys[5] = 0;
-                    ;
-                    break;
-                case Key.E:
-                    Chip8.Keys[6] = 0;
-                    ;
-                    break;
-                case Key.R:
-                    Chip8.Keys[7] = 0;
-                    ;
-                    break;
-                case Key.A:
-                    Chip8.Keys[8] = 0;
-                    ;
-                    break;
-                case Key.S:
-                    Chip8.Keys[9] = 0;
-                    ;
-                    break;
-                case Key.D:
-                    Chip8.Keys[10] = 0;
-                    ;
-                    break;
-                case Key.F:
-                    Chip8.Keys[11] = 0;
-                    ;
-                    break;
-                case Key.Z:
-                    Chip8.Keys[12] = 0;
-                    ;
-                    break;
-                case Key.X:
-                    Chip8.Keys[13] = 0;
-                    ;
-                    break;
-                case Key.C:
-                    Chip8.Keys[14] = 0;
-                    ;
-                    break;
-                case Key.V:
-                    Chip8.Keys[15] = 0;
-                    ;
-                    break;
+                Chip8.Keys[keyMap[keyEventArgs.Key]] = 0;
             }
-
         }
     }
 }

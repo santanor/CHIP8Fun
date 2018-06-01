@@ -76,7 +76,7 @@ namespace CHIP8Fun.WPF
                 var dataValue = new TextBox
                 {
                     IsEnabled = false,
-                    Text = i.ToString(),
+                    Text = i.ToString("X"),
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     VerticalAlignment = VerticalAlignment.Center
                 };
@@ -152,12 +152,26 @@ namespace CHIP8Fun.WPF
                     IValue.Text = emulator.Chip8.I.ToString();
                     DelayTimerValue.Text = emulator.Chip8.DelayTimer.ToString();
                     SoundtimerValue.Text = emulator.Chip8.SoundTimer.ToString();
+
+                    SelectAndScrollValuesIntoView();
                 });
             }
             catch (Exception e)
             {
                 Debug.WriteLine("Thank you for playing Wing Commander");
             }
+        }
+
+        /// <summary>
+        /// Focuses on the values defined by SP and PC. It also jumps to that position
+        /// </summary>
+        private void SelectAndScrollValuesIntoView()
+        {
+            MemoryGrid.SelectedIndex = emulator.Chip8.Pc;
+            MemoryGrid.ScrollIntoView(MemoryGrid.SelectedItem);
+
+            StackGrid.SelectedIndex = emulator.Chip8.Sp;
+            StackGrid.ScrollIntoView(StackGrid.SelectedIndex);
         }
 
 

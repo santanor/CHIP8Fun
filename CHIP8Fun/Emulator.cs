@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Input;
 
 namespace CHIP8Fun
@@ -15,6 +16,7 @@ namespace CHIP8Fun
         private Bitmap backingImage;
         public CHIP8System Chip8;
         public bool IsRunning;
+        private bool isDebuggerRunning;
 
         /// <summary>
         /// Map of the keys used by the emulator
@@ -57,6 +59,61 @@ namespace CHIP8Fun
             // Emulation loop
             while (true)
             {
+                if (isDebuggerRunning)
+                {
+                    RunWithDebugger();
+                }
+                else
+                {
+                    RunNoDebugger();
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// Runs the program without the debugger attached, it'll still print debug instructions to the UI
+        /// </summary>
+        private void RunNoDebugger()
+        {
+            // Emulate one cycle
+            Chip8.EmulateCycle();
+
+            // If the draw flag is set, update the screen
+            if (Chip8.V[15] == 1)
+            {
+                var newFrame = DrawGraphics();
+                OnNewFrame?.Invoke(newFrame);
+                Chip8.V[15] = 0;
+            }
+
+            //Notifies the debugger to do its thing
+            var currentTime = (DateTime.Now - DateTime.MinValue).TotalMilliseconds;
+            var milisecondsSinceLastUpdate = currentTime - timerCounter;
+
+            //more than 1/60th of a second passed
+            if (milisecondsSinceLastUpdate > 20)
+            {
+                timerCounter = currentTime;
+                OnDebugTick?.Invoke();
+            }
+        }
+
+        #region debugger
+
+        private bool paused;
+        private bool step;
+
+        private void RunWithDebugger()
+        {
+            if (paused)
+            {
+                //Just wait a little bit to free up the cpu
+                Thread.Sleep(10);
+            }
+            else
+            {
                 // Emulate one cycle
                 Chip8.EmulateCycle();
 
@@ -68,18 +125,43 @@ namespace CHIP8Fun
                     Chip8.V[15] = 0;
                 }
 
-                //Notifies the debugger to do its thing
-                var currentTime = (DateTime.Now - DateTime.MinValue).TotalMilliseconds;
-                var milisecondsSinceLastUpdate = currentTime - timerCounter;
+                OnDebugTick?.Invoke();
 
-                //more than 1/60th of a second passed
-                if (milisecondsSinceLastUpdate > 20)
+                if (step)
                 {
-                    timerCounter = currentTime;
-                    OnDebugTick?.Invoke();
+                    step = false;
+                    paused = true;
                 }
             }
+
         }
+
+        /// <summary>
+        /// Pauses the execution
+        /// </summary>
+        private void Pause()
+        {
+            isDebuggerRunning = true;
+            paused = true;
+        }
+
+        private void Step()
+        {
+            paused = false;
+            step = true;
+        }
+
+        /// <summary>
+        /// Resumes the execution
+        /// </summary>
+        private void Continue()
+        {
+            paused = false;
+            isDebuggerRunning = false;
+        }
+
+    #endregion debugger
+
 
         /// <summary>
         /// Presents the backBuffer to the displaying image in the frontend
@@ -107,6 +189,17 @@ namespace CHIP8Fun
             if (keyMap.ContainsKey(keyEventArgs.Key))
             {
                 Chip8.Keys[keyMap[keyEventArgs.Key]] = (byte)keyEventArgs.Key;
+            }
+
+            //Now for the debugger keys
+            if (keyEventArgs.Key == Key.System)//Apparently this is the value for F10
+            {
+                Step();
+            }
+            if (keyEventArgs.Key == Key.F5)
+            {
+                if (paused) Continue();
+                else Pause();
             }
         }
 

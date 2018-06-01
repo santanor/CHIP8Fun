@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CHIP8System.cs" />
+    <Compile Include="Debugger.cs" />
     <Compile Include="GPU.cs" />
     <Compile Include="Opcodes.cs" />
     <Compile Include="Emulator.cs" />

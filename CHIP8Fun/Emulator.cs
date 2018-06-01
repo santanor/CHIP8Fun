@@ -9,19 +9,26 @@ namespace CHIP8Fun
 {
     public class Emulator
     {
-        public delegate void DebugEvent();
-
+        public delegate void UIEvent();
         public delegate void NewFrame(Bitmap img);
+        public delegate void KeyPressedEvent(KeyEventArgs keyEventArgs);
 
         private Bitmap backingImage;
         public CHIP8System Chip8;
         public bool IsRunning;
-        private bool isDebuggerRunning;
+        public const bool Debug = true;
+        private Debugger debugger;
+        private double timerCounter;
+
+        public UIEvent OnUiTick;
+        public NewFrame OnNewFrame;
+        public KeyPressedEvent OnUIKeyDown;
+        public KeyPressedEvent OnUIKeyUp;
 
         /// <summary>
         /// Map of the keys used by the emulator
         /// </summary>
-        private IDictionary<Key, int> keyMap = new Dictionary<Key, int>
+        private readonly IDictionary<Key, int> keyMap = new Dictionary<Key, int>
         {
             {Key.D1, 0},
             {Key.D2, 1},
@@ -41,10 +48,7 @@ namespace CHIP8Fun
             {Key.V, 15}
         };
 
-        public DebugEvent OnDebugTick;
 
-        public NewFrame OnNewFrame;
-        private double timerCounter;
 
         /// <summary>
         /// Emulator Loop
@@ -56,17 +60,14 @@ namespace CHIP8Fun
             Chip8.LoadProgram("Tetris.ch8");
             IsRunning = true;
 
-            // Emulation loop
-            while (true)
+            if (Debug)
             {
-                if (isDebuggerRunning)
-                {
-                    RunWithDebugger();
-                }
-                else
-                {
-                    RunNoDebugger();
-                }
+                debugger = new Debugger(this);
+                debugger.Run();
+            }
+            else
+            {
+                RunNoDebugger();
             }
         }
 
@@ -77,17 +78,18 @@ namespace CHIP8Fun
         /// </summary>
         private void RunNoDebugger()
         {
-            // Emulate one cycle
-            Chip8.EmulateCycle();
-
-            // If the draw flag is set, update the screen
-            if (Chip8.V[15] == 1)
+            while (true)
             {
-                var newFrame = DrawGraphics();
-                OnNewFrame?.Invoke(newFrame);
-                Chip8.V[15] = 0;
-            }
+                // Emulate one cycle
+                Chip8.EmulateCycle();
+                TryPresentFrame();
+                TryUpdateUiData();
 
+            }
+        }
+
+        public void TryUpdateUiData()
+        {
             //Notifies the debugger to do its thing
             var currentTime = (DateTime.Now - DateTime.MinValue).TotalMilliseconds;
             var milisecondsSinceLastUpdate = currentTime - timerCounter;
@@ -96,72 +98,22 @@ namespace CHIP8Fun
             if (milisecondsSinceLastUpdate > 20)
             {
                 timerCounter = currentTime;
-                OnDebugTick?.Invoke();
+                OnUiTick?.Invoke();
             }
-        }
-
-        #region debugger
-
-        private bool paused;
-        private bool step;
-
-        private void RunWithDebugger()
-        {
-            if (paused)
-            {
-                //Just wait a little bit to free up the cpu
-                Thread.Sleep(10);
-            }
-            else
-            {
-                // Emulate one cycle
-                Chip8.EmulateCycle();
-
-                // If the draw flag is set, update the screen
-                if (Chip8.V[15] == 1)
-                {
-                    var newFrame = DrawGraphics();
-                    OnNewFrame?.Invoke(newFrame);
-                    Chip8.V[15] = 0;
-                }
-
-                OnDebugTick?.Invoke();
-
-                if (step)
-                {
-                    step = false;
-                    paused = true;
-                }
-            }
-
         }
 
         /// <summary>
-        /// Pauses the execution
+        /// If the draw flag is set, update the screen
         /// </summary>
-        private void Pause()
+        public void TryPresentFrame()
         {
-            isDebuggerRunning = true;
-            paused = true;
+            if (Chip8.V[15] == 1)
+            {
+                var newFrame = DrawGraphics();
+                OnNewFrame?.Invoke(newFrame);
+                Chip8.V[15] = 0;
+            }
         }
-
-        private void Step()
-        {
-            paused = false;
-            step = true;
-        }
-
-        /// <summary>
-        /// Resumes the execution
-        /// </summary>
-        private void Continue()
-        {
-            paused = false;
-            isDebuggerRunning = false;
-        }
-
-    #endregion debugger
-
 
         /// <summary>
         /// Presents the backBuffer to the displaying image in the frontend
@@ -190,17 +142,7 @@ namespace CHIP8Fun
             {
                 Chip8.Keys[keyMap[keyEventArgs.Key]] = (byte)keyEventArgs.Key;
             }
-
-            //Now for the debugger keys
-            if (keyEventArgs.Key == Key.System)//Apparently this is the value for F10
-            {
-                Step();
-            }
-            if (keyEventArgs.Key == Key.F5)
-            {
-                if (paused) Continue();
-                else Pause();
-            }
+            OnUIKeyDown?.Invoke(keyEventArgs);
         }
 
         /// <summary>
@@ -214,6 +156,7 @@ namespace CHIP8Fun
             {
                 Chip8.Keys[keyMap[keyEventArgs.Key]] = 0;
             }
+            OnUIKeyUp?.Invoke(keyEventArgs);
         }
     }
 }

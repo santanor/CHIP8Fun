@@ -1,46 +1,32 @@
 ﻿using System;
-using System.Diagnostics;
 
-#pragma warning disable 1570
-
-namespace CHIP8Fun
+namespace CHIP8Fun.Disassembler
 {
-    public class Opcodes
+    public class OpcodesInstructionSet
     {
-        private readonly CHIP8System s;
-
-        public Opcodes(CHIP8System s)
-        {
-            this.s = s;
-        }
-
         /// <summary>
         /// Call
         /// Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void _0NNN(short code)
+        public DissasembledLineModel _0NNN(short code)
         {
             throw new NotImplementedException($"code: {code:x} not implemented");
         }
 
         /// <summary>
-        /// Display
         /// Clears the screen.
         /// </summary>
-        public void _00E0()
+        public DissasembledLineModel _00E0()
         {
-            for (var i = 0; i < s.Gfx.GetLength(0); i++)
+            var dlm = new DissasembledLineModel
             {
-                for (var j = 0; j < s.Gfx.GetLength(1); j++)
-                {
-                    s.Gfx[i, j] = true;
-                }
-            }
+                AssemblyCode = "CLS",
+                Description = "Clears the screen",
+                Opcode = "00E0"
+            };
 
-            s.V[15] = 1;
-            s.Pc += 2;
+            return dlm;
         }
 
         /// <summary>
@@ -48,131 +34,84 @@ namespace CHIP8Fun
         /// Returns from a subroutine
         /// </summary>
         /// <param name="code"></param>
-        public void _00EE(short code)
+        public DissasembledLineModel _00EE(short code)
         {
-            s.Sp--;
-            s.Pc = s.Stack[s.Sp];
-            s.Pc += 2;
+            return CreateDLM("RET", "Returns from a subroutine", code);
         }
 
         /// <summary>
-        /// Flow
         /// goto NNN. Jumps to address NNN
         /// </summary>
         /// <param name="code"></param>
-        public void _1NNN(short code)
+        public DissasembledLineModel _1NNN(short code)
         {
-            var address = code & 0xFFF;
-            s.Pc = (short)address;
+            var nnn = code & 0xFFF;
+            return CreateDLM($"JP {nnn}", $"Jumps to address {nnn}", code);
         }
 
         /// <summary>
-        /// Flow
         /// Calls subroutine at NNN
         /// </summary>
         /// <param name="code"></param>
-        public void _2NNN(short code)
+        public DissasembledLineModel _2NNN(short code)
         {
-            if (s.Sp >= s.Stack.Length)
-            {
-                Debug.WriteLine($"Stack Overflow! opcode{code:x}");
-                return;
-            }
-
-            var label = code & 0x0FFF; //get the label address from the opcode
-            s.Stack[s.Sp] = s.Pc; //backup the current PC in the stack
-            s.Sp++; //Increment the stack pointer to an empty position
-            s.Pc = (short)label; //Move the PC to the label
+            var nnn = code & 0x0FFF;
+            return CreateDLM($"CALL {nnn}", $"Calls subroutine at memory address {nnn}", code);
         }
 
         /// <summary>
-        /// Cond
-        /// Skips the next statement if VX equals nn. (Usually the next instruction is a jump to skip
-        /// a code block)
+        /// Skips the next statement if VX equals nn.
         /// </summary>
         /// <param name="code"></param>
-        public void _3XNN(short code)
+        public DissasembledLineModel _3XNN(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
-
-            if (s.V[x] == nn)
-            {
-                s.Pc += 4;
-            }
-            else
-            {
-                s.Pc += 2;
-            }
+            return CreateDLM($"SE V{x}, {nn}", $"Skips the next statement if V{x} equals {nn}", code);
         }
 
         /// <summary>
-        /// Cond
         /// Skips the next istruction if VX doesn't equal nn
-        /// (Usually the next instruction is a jump to skip a code block)
         /// </summary>
         /// <param name="code"></param>
-        public void _4XNN(short code)
+        public DissasembledLineModel _4XNN(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
-
-            if (s.V[x] != nn)
-            {
-                s.Pc += 4;
-            }
-            else
-            {
-                s.Pc += 2;
-            }
+            return CreateDLM($"SNE V{x}, {nn}", $"Skips the next instruction if V{x} doesn't equal {nn}", code);
         }
 
         /// <summary>
-        /// Cond
         /// Skips the next instruction if VX equals VY.
-        /// (Usually the next instruction is a jump to skip a code block)
         /// </summary>
         /// <param name="code"></param>
-        public void _5XY0(short code)
+        public DissasembledLineModel _5XY0(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            if (s.V[x] == s.V[y])
-            {
-                s.Pc += 4;
-            }
-            else
-            {
-                s.Pc += 2;
-            }
+            return CreateDLM($"SE V{x}, V{y}", $"Skips the next instruction if V{x} equals V{y}", code);
         }
 
         /// <summary>
-        /// Const
         /// Sets VX to nn
         /// </summary>
         /// <param name="code"></param>
-        public void _6XNN(short code)
+        public DissasembledLineModel _6XNN(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var nn = (byte)(code & 0x00FF);
-            s.V[x] = nn;
-            s.Pc += 2;
+            return CreateDLM($"LD V{x}, {nn}", $"Sets V{x} to {nn}", code);
         }
 
         /// <summary>
-        /// Const
         /// Adds nn to VX. (Carry flag is not changed)
         /// </summary>
         /// <param name="code"></param>
-        public void _7XNN(short code)
+        public DissasembledLineModel _7XNN(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
-
-            s.V[x] += (byte)nn;
-            s.Pc += 2;
+            return CreateDLM($"ADD V{x}, {nn}", $"Adds {nn} to V{x}", code);
         }
 
         /// <summary>
@@ -180,15 +119,11 @@ namespace CHIP8Fun
         /// Sets VX to the value of VY
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void _8XY0(short code)
+        public DissasembledLineModel _8XY0(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[x] = s.V[y];
-
-            s.Pc += 2;
+            return CreateDLM($"LD V{x}, V{y}", $"Sets V{x} to the value of V{y}", code);
         }
 
         /// <summary>
@@ -196,15 +131,11 @@ namespace CHIP8Fun
         /// Sets VX to VX or VY. (Bitwise OR operation)
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void _8XY1(short code)
+        public DissasembledLineModel _8XY1(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[x] |= s.V[y];
-
-            s.Pc += 2;
+            return CreateDLM($"OR V{x}, V{y}", $"Sets V{x} to V{x} OR V{y} (Bitwise OR operatiorn", code);
         }
 
         /// <summary>
@@ -212,15 +143,11 @@ namespace CHIP8Fun
         /// Sets VX to VX and VY. (Bitwise AND operation).
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void _8XY2(short code)
+        public DissasembledLineModel _8XY2(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[x] &= s.V[y];
-
-            s.Pc += 2;
+            return CreateDLM($"AND V{x}, V{y}", $"Sets V{x} to V{x} AND V{y} (Bitwise AND operatiorn", code);
         }
 
         /// <summary>
@@ -228,14 +155,11 @@ namespace CHIP8Fun
         /// Sets VX to VX xor VY.
         /// </summary>
         /// <param name="code"></param>
-        public void _8XY3(short code)
+        public DissasembledLineModel _8XY3(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[x] ^= s.V[y];
-
-            s.Pc += 2;
+            return CreateDLM($"XOR V{x}, V{y}", $"Sets V{x} to V{x} XOR V{y} (Bitwise XOR operatiorn", code);
         }
 
         /// <summary>
@@ -243,16 +167,13 @@ namespace CHIP8Fun
         /// Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
         /// </summary>
         /// <param name="code"></param>
-        public void _8XY4(short code)
+        public DissasembledLineModel _8XY4(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[s.VF] = s.V[x] + s.V[y] > 0xFF ? (byte)1 : (byte)0;
-
-            s.V[x] += s.V[y];
-
-            s.Pc += 2;
+            return CreateDLM($"ADD V{x}, V{y}",
+                             $"Adds V{y} to V{x}. VF is set to 1 when there's a carry, and to 0 when there isn't.",
+                             code);
         }
 
         /// <summary>
@@ -260,16 +181,13 @@ namespace CHIP8Fun
         /// VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
         /// </summary>
         /// <param name="code"></param>
-        public void _8XY5(short code)
+        public DissasembledLineModel _8XY5(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[s.VF] = s.V[x] < s.V[y] ? (byte)0 : (byte)1;
-
-            s.V[x] = (byte)(s.V[x] - s.V[y]);
-
-            s.Pc += 2;
+            return CreateDLM($"SUB V{x}, V{y}",
+                             $"Subs V{y} to V{x}. VF is set to 0 when there's a borrow, and 1 when there isn't.",
+                             code);
         }
 
         /// <summary>
@@ -278,15 +196,14 @@ namespace CHIP8Fun
         /// VF is set to the value of the least significant bit of VY before the shift.
         /// </summary>
         /// <param name="code"></param>
-        public void _8XY6(short code)
+        public DissasembledLineModel _8XY6(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[x] = (byte)(s.V[x] >> 1);
-            s.V[s.VF] = (byte)(s.V[x] & 0x1);
-
-            s.Pc += 2;
+            return CreateDLM($"SHR V{x}, V{y}",
+                             $"Shifts V{y} right by one and stores the result to V{x} (V{y} remains unchanged)" +
+                             $"VF is set to the value of the least significant bit of V{y} before the shift."
+                             , code);
         }
 
         /// <summary>
@@ -294,16 +211,14 @@ namespace CHIP8Fun
         /// Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
         /// </summary>
         /// <param name="code"></param>
-        public void _8XY7(short code)
+        public DissasembledLineModel _8XY7(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[s.VF] = s.V[x] > s.V[y] ? (byte)0 : (byte)1;
-
-            s.V[x] = (byte)(s.V[y] - s.V[x]);
-
-            s.Pc += 2;
+            return CreateDLM($"SUBN V{x}, V{y}",
+                             $"Sets V{x} to V{y} minus V{x}. " +
+                             $"VF is set to 0 when there's a borrow, and 1 when there isn't.",
+                             code);
         }
 
         /// <summary>
@@ -312,16 +227,14 @@ namespace CHIP8Fun
         /// VF is set to the value of the most significant bit of VY before the shift.
         /// </summary>
         /// <param name="code"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void _8XYE(short code)
+        public DissasembledLineModel _8XYE(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            s.V[s.VF] = (byte)(s.V[x] >> 7);
-            s.V[x] <<= 1;
-
-            s.Pc += 2;
+            return CreateDLM($"SHL V{x}, V{y}",
+                             $"Shifts V{y} left by one and copies the result to V{x}." +
+                             $"VF is set to the value of the most significant bit of V{y} before the shift.",
+                             code);
         }
 
         /// <summary>
@@ -330,19 +243,11 @@ namespace CHIP8Fun
         /// (Usually the next instruction is a jump to skip a code block)
         /// </summary>
         /// <param name="code"></param>
-        public void _9XY0(short code)
+        public DissasembledLineModel _9XY0(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
-
-            if (s.V[x] != s.V[y])
-            {
-                s.Pc += 4;
-            }
-            else
-            {
-                s.Pc += 2;
-            }
+            return CreateDLM($"SNE V{x}, V{y}", $"Skips the next instruction if V{x} doesn't equal V{y}.", code);
         }
 
         /// <summary>
@@ -350,10 +255,10 @@ namespace CHIP8Fun
         /// Sets I to the address NNN.
         /// </summary>
         /// <param name="code"></param>
-        public void ANNN(short code)
+        public DissasembledLineModel ANNN(short code)
         {
-            s.I = (short)(code & 0x0FFF);
-            s.Pc += 2;
+            var nnn = (short)(code & 0x0FFF);
+            return CreateDLM($"LD I, {nnn}", $"Sets I to the address {nnn}", code);
         }
 
         /// <summary>
@@ -361,12 +266,10 @@ namespace CHIP8Fun
         /// Jumps to the address NNN plus V0.
         /// </summary>
         /// <param name="code"></param>
-        public void BNNN(short code)
+        public DissasembledLineModel BNNN(short code)
         {
-            var address = (short)(code & 0x0FFF);
-            address += s.V[0];
-
-            s.Pc = address;
+            var nnn = (short)(code & 0x0FFF);
+            return CreateDLM($"JP V0, {nnn}", $"Jumps to the address {nnn} plus V0.", code);
         }
 
         /// <summary>
@@ -374,15 +277,14 @@ namespace CHIP8Fun
         /// Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and nn.
         /// </summary>
         /// <param name="code"></param>
-        public void CXNN(short code)
+        public DissasembledLineModel CXNN(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var nn = code & 0x00FF;
-
-            var rand = new Random().Next(0, 255);
-
-            s.V[x] = (byte)(rand & nn);
-            s.Pc += 2;
+            return CreateDLM($"RND V{x}, {nn}",
+                             $"Sets V{x} to the result of a bitwise and operation on a random number " +
+                             $"(Typically: 0 to 255) and {nn}.",
+                             code);
         }
 
         /// <summary>
@@ -394,21 +296,14 @@ namespace CHIP8Fun
         /// and to 0 if that doesn’t happen
         /// </summary>
         /// <param name="code"></param>
-        public void DXYN(short code)
+        public DissasembledLineModel DXYN(short code)
         {
             var x = (code & 0x0F00) >> 8;
             var y = (code & 0x00F0) >> 4;
             var N = code & 0x000F;
-
-            //Create a temp array to hold the bytes for the sprite
-            var spriteData = new byte[N];
-            for (var i = 0; i < N; i++)
-            {
-                spriteData[i] = s.Memory[s.I + i];
-            }
-
-            s.Draw(s.V[x], s.V[y], spriteData);
-            s.Pc += 2;
+            return CreateDLM($"DRW V{x}, V{y}, {N}",
+                             $"Draws a sprite at coordinate (V{x}, V{y}) that has a width of 8 pixels and a height of {N} pixels.",
+                             code);
         }
 
         /// <summary>
@@ -417,18 +312,10 @@ namespace CHIP8Fun
         /// (Usually the next instruction is a jump to skip a code block)
         /// </summary>
         /// <param name="code"></param>
-        public void EX9E(short code)
+        public DissasembledLineModel EX9E(short code)
         {
             var x = (code & 0x0F00) >> 8;
-
-            if (s.Keys[s.V[x]] != 0)
-            {
-                s.Pc += 4;
-            }
-            else
-            {
-                s.Pc += 2;
-            }
+            return CreateDLM($"SKP V{x}", $"Skips the next instruction if the key stored in V{x} is pressed", code);
         }
 
         /// <summary>
@@ -437,18 +324,10 @@ namespace CHIP8Fun
         /// (Usually the next instruction is a jump to skip a code block)
         /// </summary>
         /// <param name="code"></param>
-        public void EXA1(short code)
+        public DissasembledLineModel EXA1(short code)
         {
             var x = (code & 0x0F00) >> 8;
-
-            if (s.Keys[s.V[x]] == 0)
-            {
-                s.Pc += 4;
-            }
-            else
-            {
-                s.Pc += 2;
-            }
+            return CreateDLM($"SKNP V{x}", $"Skips the next isntruction if the key stored in V{x} isn't pressed", code);
         }
 
         /// <summary>
@@ -456,13 +335,10 @@ namespace CHIP8Fun
         /// Sets VX to the value of the delay timer.
         /// </summary>
         /// <param name="code"></param>
-        public void FX07(short code)
+        public DissasembledLineModel FX07(short code)
         {
             var x = (code & 0x0F00) >> 8;
-
-            s.V[x] = s.DelayTimer;
-
-            s.Pc += 2;
+            return CreateDLM($"LD V{x}, DT", $"Sets V{x} to the value of the delay timer", code);
         }
 
         /// <summary>
@@ -471,16 +347,10 @@ namespace CHIP8Fun
         /// (Blocking Operation. All instruction halted until next key event)
         /// </summary>
         /// <param name="code"></param>
-        public void FX0A(short code)
+        public DissasembledLineModel FX0A(short code)
         {
             var x = (code & 0x0F00) >> 8;
-            //Blocking operation. Waits for a key to be pressed
-            var key = s.AnyKeyPressed();
-            if (key != 0)
-            {
-                s.V[x] = s.AnyKeyPressed();
-                s.Pc += 2;
-            }
+            return CreateDLM($"LD V{x}, K", $"A Key pressed is awaited and then stored in V{x}", code);
         }
 
         /// <summary>
@@ -488,13 +358,10 @@ namespace CHIP8Fun
         /// Sets the delay timer to VX.
         /// </summary>
         /// <param name="code"></param>
-        public void FX15(short code)
+        public DissasembledLineModel FX15(short code)
         {
             var x = (code & 0xF00) >> 8;
-
-            s.DelayTimer = s.V[x];
-
-            s.Pc += 2;
+            return CreateDLM($"LD DT, V{x}", $"Sets the delay timer to V{x}", code);
         }
 
         /// <summary>
@@ -502,13 +369,10 @@ namespace CHIP8Fun
         /// Sets the sound timer to VX.
         /// </summary>
         /// <param name="code"></param>
-        public void FX18(short code)
+        public DissasembledLineModel FX18(short code)
         {
             var x = (code & 0xF00) >> 8;
-
-            s.SoundTimer = s.V[x];
-
-            s.Pc += 2;
+            return CreateDLM($"LD ST, V{x}", $"Sets the sound timer to V{x}", code);
         }
 
         /// <summary>
@@ -516,15 +380,10 @@ namespace CHIP8Fun
         /// Adds VX to I.
         /// </summary>
         /// <param name="code"></param>
-        public void FX1E(short code)
+        public DissasembledLineModel FX1E(short code)
         {
             var x = (code & 0xF00) >> 8;
-
-            s.V[s.VF] = s.I + s.V[(code & 0x0F00) >> 8] > 0xFFF ? (byte)1 : (byte)0;
-
-            s.I += s.V[x];
-
-            s.Pc += 2;
+            return CreateDLM($"ADD I, V{x}", $"Adds V{x} to I", code);
         }
 
         /// <summary>
@@ -533,13 +392,10 @@ namespace CHIP8Fun
         /// Characters 0-F (in hexadecimal) are represented by a 4x5 font.
         /// </summary>
         /// <param name="code"></param>
-        public void FX29(short code)
+        public DissasembledLineModel FX29(short code)
         {
             var x = (code & 0xF00) >> 8;
-
-            s.I = (byte)(s.V[x] * 0x5);
-
-            s.Pc += 2;
+            return CreateDLM($"LD F, V{x}", $"Sets I to the location of the sprite for the character in V{x}", code);
         }
 
         /// <summary>
@@ -552,14 +408,14 @@ namespace CHIP8Fun
         /// the tens digit at location I+1, and the ones digit at location I+2.)
         /// </summary>
         /// <param name="code"></param>
-        public void FX33(short code)
+        public DissasembledLineModel FX33(short code)
         {
             var x = (code & 0xF00) >> 8;
-            var value = s.V[x];
-            s.Memory[s.I] = (byte)(value / 100);
-            s.Memory[s.I + 1] = (byte)(value / 10 % 10);
-            s.Memory[s.I + 2] = (byte)(value % 100 % 10);
-            s.Pc += 2;
+            return CreateDLM($"LD B, V{x}",
+                             $"Stores the binary-coded decimal representation of VX," +
+                             $"with the most significant of three digits at the address in I," +
+                             $"the middle digit at I plus 1, and the least significant digit at I plus 2.",
+                             code);
         }
 
         /// <summary>
@@ -567,18 +423,12 @@ namespace CHIP8Fun
         /// Stores V0 to VX (including VX) in memory starting at address I. I is increased by 1 for each value written.
         /// </summary>
         /// <param name="code"></param>
-        public void FX55(short code)
+        public DissasembledLineModel FX55(short code)
         {
             var x = (code & 0xF00) >> 8;
-
-            for (var i = 0; i <= x; i++)
-            {
-                s.Memory[s.I + i] = s.V[i];
-            }
-
-            s.I += (short)(x + 1);
-
-            s.Pc += 2;
+            return CreateDLM($"LD I, V{x}",
+                             $"Stores V0 to VX {x} including V{x}) in memory starting at address I." +
+                             $" I is increased by 1 for each value written", code);
         }
 
         /// <summary>
@@ -587,18 +437,21 @@ namespace CHIP8Fun
         /// I is increased by 1 for each value written.
         /// </summary>
         /// <param name="code"></param>
-        public void FX65(short code)
+        public DissasembledLineModel FX65(short code)
         {
             var x = (code & 0xF00) >> 8;
+            return CreateDLM($"LD V{x}, I",
+                             $"Fills V0 to V{x} (including V{x}) with values from memory starting at address I.", code);
+        }
 
-            for (var i = 0; i <= x; i++)
+        private DissasembledLineModel CreateDLM(string assembly, string description, short code)
+        {
+            return new DissasembledLineModel
             {
-                s.V[i] = s.Memory[s.I + i];
-            }
-
-            s.I += (short)(x + 1);
-
-            s.Pc += 2;
+                AssemblyCode = assembly,
+                Description = description,
+                Opcode = code.ToString("X")
+            };
         }
     }
 }

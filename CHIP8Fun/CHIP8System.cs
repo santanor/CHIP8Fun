@@ -295,7 +295,7 @@ namespace CHIP8Fun
         /// and start filling the memory at location: 0x200 == 512.
         /// </summary>
         /// <param name="fileName"></param>
-        public void LoadProgram(string fileName)
+        public byte[] LoadProgram(string fileName)
         {
             try
             {
@@ -304,10 +304,13 @@ namespace CHIP8Fun
                 {
                     Memory[i + 512] = buffer[i];
                 }
+
+                return buffer;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                return null;
             }
         }
 

@@ -5,90 +5,100 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="MainWindow" Width="1000" Height="480">
-        <DockPanel HorizontalAlignment="Left">
+    <DockPanel HorizontalAlignment="Left">
+        <!--Dissasembled code and executable-->
+        <StackPanel>
+            <!--Code-->
+            <ScrollViewer Height="200">
+                <TextBlock Name="DissasembledCode" ></TextBlock>
+            </ScrollViewer>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <Image
                 Name="bmp"
                 RenderOptions.BitmapScalingMode="NearestNeighbor"
                 MinHeight="160"
                 MinWidth="320"
                 MaxHeight="320"
-                MaxWidth="480"></Image>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                MaxWidth="480" />
+        </StackPanel>
 
-            <!--For the debugger-->
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
-                <!-- Heres where the values of the PC, I and registers go-->
-                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <Label Content="CPU" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label><Grid >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                             <RowDefinition />
-                    </Grid.RowDefinitions>
+        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
 
-                    <!--PC-->
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="PC"></TextBlock>
-                    <TextBox Name="PCValue" Grid.Row="0" Grid.Column="1" Text="PC"
-                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+        <!--For the debugger-->
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+            <!-- Heres where the values of the PC, I and registers go-->
+            <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <Label Content="CPU" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-                    <!--I-->
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="I"></TextBlock>
-                    <TextBox Name="IValue" Grid.Row="1" Grid.Column="1" Text="I"
-                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+                <!--PC-->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="PC" />
+                <TextBox Name="PCValue" Grid.Row="0" Grid.Column="1" Text="PC"
+                         HorizontalAlignment="Stretch" IsEnabled="False" />
 
-                    <!--SP-->
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="SP"></TextBlock>
-                    <TextBox Name="SPValue" Grid.Row="2" Grid.Column="1" Text="SP"
-                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+                <!--I-->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="I" />
+                <TextBox Name="IValue" Grid.Row="1" Grid.Column="1" Text="I"
+                         HorizontalAlignment="Stretch" IsEnabled="False" />
 
-                    <!--Delay timer-->
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="DELAY"></TextBlock>
-                    <TextBox Name="DelayTimerValue" Grid.Row="3" Grid.Column="1" Text="DELAY"
-                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
+                <!--SP-->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="SP" />
+                <TextBox Name="SPValue" Grid.Row="2" Grid.Column="1" Text="SP"
+                         HorizontalAlignment="Stretch" IsEnabled="False" />
 
-                    <!--Sound timer-->
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="SOUND"></TextBlock>
-                    <TextBox Name="SoundtimerValue" Grid.Row="4" Grid.Column="1" Text="SOUND"
-                             HorizontalAlignment="Stretch" IsEnabled="False"></TextBox>
-                </Grid>
+                <!--Delay timer-->
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="DELAY" />
+                <TextBox Name="DelayTimerValue" Grid.Row="3" Grid.Column="1" Text="DELAY"
+                         HorizontalAlignment="Stretch" IsEnabled="False" />
 
-                <!--Registers view-->
-                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <StackPanel>
-                    <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                    <Label Content="Registers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-                    <ListView Name="RegistersGrid" Height="250" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
-                </StackPanel>
-            </StackPanel>
+                <!--Sound timer-->
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="SOUND" />
+                <TextBox Name="SoundtimerValue" Grid.Row="4" Grid.Column="1" Text="SOUND"
+                         HorizontalAlignment="Stretch" IsEnabled="False" />
+            </Grid>
 
-            <!--Memory view-->
+            <!--Registers view-->
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <StackPanel>
                 <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <Label Content="Memory" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-                <ListView Name="MemoryGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
+                <Label Content="Registers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                <ListView Name="RegistersGrid" Height="250" MaxHeight="1080" HorizontalAlignment="Stretch" />
             </StackPanel>
+        </StackPanel>
 
-            <!--Stack view-->
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-            <StackPanel>
-                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <Label Content="Stack" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-                <ListView Name="StackGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
-            </StackPanel>
+        <!--Memory view-->
+        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        <StackPanel>
+            <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <Label Content="Memory" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+            <ListView Name="MemoryGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch" />
+        </StackPanel>
 
-            <!--Keys view-->
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-            <StackPanel>
-                <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <Label Content="Keys" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"></Label>
-                <ListView Name="KeysGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch"></ListView>
-            </StackPanel>
+        <!--Stack view-->
+        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        <StackPanel>
+            <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <Label Content="Stack" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+            <ListView Name="StackGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+        <!--Keys view-->
+        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        <StackPanel>
+            <Separator HorizontalAlignment="Stretch" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <Label Content="Keys" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+            <ListView Name="KeysGrid" Height="400" MaxHeight="1080" HorizontalAlignment="Stretch" />
+        </StackPanel>
     </DockPanel>
 </Window>

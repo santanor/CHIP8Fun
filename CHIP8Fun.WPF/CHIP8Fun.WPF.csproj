@@ -83,6 +83,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CHIP8Fun.Disassembler\CHIP8Fun.Disassembler.csproj">
+      <Project>{bff566a3-4cb3-449d-8ce5-6026b39de8ea}</Project>
+      <Name>CHIP8Fun.Disassembler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CHIP8Fun\CHIP8Fun.csproj">
       <Project>{2b47c708-7b6f-4e1a-bbb5-86ad65c1e309}</Project>
       <Name>CHIP8Fun</Name>

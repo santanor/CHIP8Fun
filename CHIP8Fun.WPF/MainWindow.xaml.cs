@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using CHIP8Fun.Disassembler;
 
 namespace CHIP8Fun.WPF
 {
@@ -16,6 +18,7 @@ namespace CHIP8Fun.WPF
     public partial class MainWindow
     {
         private Emulator emulator;
+        private Disassembler.Disassembler disassembler;
         private TextBox[] keyValues;
         private TextBox[] memoryValues;
         private TextBox[] registersValues;
@@ -51,6 +54,24 @@ namespace CHIP8Fun.WPF
             KeyUp += emulator.OnKeyReleased;
             emulator.OnNewFrame += OnImageChanged;
             emulator.OnUiTick += OnRefreshDebugGrids;
+
+            //Initialize the dissasembler
+            disassembler = new Disassembler.Disassembler(emulator.ProgramCode);
+            DissasembledCode.Text = FormatDissasembledCode(disassembler.Dissasemble());
+        }
+
+        private string FormatDissasembledCode(DissasembledModel dissasemble)
+        {
+            var sb = new StringBuilder();
+            foreach (var dlm in dissasemble.LineModels)
+            {
+                sb.AppendLine(dlm.Description);
+                sb.Append("\t").AppendLine(dlm.AssemblyCode);
+                sb.Append("\t").AppendLine(dlm.Opcode);
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

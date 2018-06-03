@@ -19,6 +19,7 @@ namespace CHIP8Fun
         public const bool Debug = true;
         private Debugger debugger;
         private double timerCounter;
+        public byte[] ProgramCode;
 
         public UIEvent OnUiTick;
         public NewFrame OnNewFrame;
@@ -57,7 +58,7 @@ namespace CHIP8Fun
         {
             // Initialize the Chip8 system and load the game into the memory
             Chip8 = new CHIP8System(backingImage);
-            Chip8.LoadProgram("Tetris.ch8");
+            ProgramCode = Chip8.LoadProgram("Tetris.ch8");
             IsRunning = true;
 
             if (Debug)
@@ -84,10 +85,12 @@ namespace CHIP8Fun
                 Chip8.EmulateCycle();
                 TryPresentFrame();
                 TryUpdateUiData();
-
             }
         }
 
+        /// <summary>
+        /// Updates the UI data if the last call happened more than 20 miliseconds ago
+        /// </summary>
         public void TryUpdateUiData()
         {
             //Notifies the debugger to do its thing

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -22,8 +25,16 @@ namespace CHIP8Fun.WPF
         private Emulator emulator;
         private TextBox[] keyValues;
         private TextBox[] memoryValues;
+
+        /// <summary>
+        /// Used tp hold a reference to the previous instruction selected in
+        /// the dissasembled window.
+        /// </summary>
+        private Block selectedInstruction;
+
         private TextBox[] registersValues;
         private TextBox[] stackValues;
+        private IDictionary<int, Paragraph> dissasembledBlocks;
 
         public MainWindow()
         {
@@ -63,22 +74,31 @@ namespace CHIP8Fun.WPF
 
         private void FormatDissasembledCode(DissasembledModel dissasemble)
         {
+            dissasembledBlocks = new Dictionary<int, Paragraph>();
             foreach (var dlm in dissasemble.LineModels)
             {
-                var descriptionText = new Run() {Foreground = Brushes.DarkGray};
+                //Only one Span per instruction will be created
+                var instructionParagraph = new Paragraph();
+
+                //Inside this Run we'll store the helper text like the deescription and the instruction
+                var descriptionText = new Run {Foreground = Brushes.DarkGray};
                 var sb = new StringBuilder();
                 sb.AppendLine(dlm.Description);
                 sb.Append("\t").AppendLine(dlm.AssemblyCode);
                 descriptionText.Text = sb.ToString();
 
-                var opcodeText = new Run()
+                //This run will have the opcode
+                var opcodeText = new Run
                 {
                     FontWeight = FontWeights.Bold,
                     Text = $"\t{dlm.Opcode}\n"
                 };
 
-                DissasembledCode.Inlines.Add(descriptionText);
-                DissasembledCode.Inlines.Add(opcodeText);
+                instructionParagraph.Inlines.Add(descriptionText);
+                instructionParagraph.Inlines.Add(opcodeText);
+
+                DissasembledCode.Blocks.Add(instructionParagraph);
+                dissasembledBlocks.Add(dlm.PositionInMemory, instructionParagraph);
             }
         }
 
@@ -96,9 +116,9 @@ namespace CHIP8Fun.WPF
 
             for (var i = 0; i < gridValues.Length; i++)
             {
-                var dataName = new Label
+                var dataName = new TextBlock()
                 {
-                    Content = i.ToString(),
+                    Text = i.ToString(),
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Center
                 };
@@ -180,6 +200,7 @@ namespace CHIP8Fun.WPF
                     PCValue.Text = emulator.Chip8.Pc.ToString();
                     SPValue.Text = emulator.Chip8.Sp.ToString();
                     IValue.Text = emulator.Chip8.I.ToString();
+                    OpcodeValue.Text = emulator.Chip8.Opcode.ToString("X");
                     DelayTimerValue.Text = emulator.Chip8.DelayTimer.ToString();
                     SoundtimerValue.Text = emulator.Chip8.SoundTimer.ToString();
 
@@ -203,8 +224,21 @@ namespace CHIP8Fun.WPF
 
             StackGrid.SelectedIndex = emulator.Chip8.Sp;
             StackGrid.ScrollIntoView(StackGrid.SelectedIndex);
-        }
 
+            //For the dissasembled code
+            if (emulator.Debugger.Paused || emulator.Debugger.StepOver)
+            {
+                if (selectedInstruction != null)
+                {
+                    selectedInstruction.Background = Brushes.Transparent;
+                }
+
+                //We do Pc-2 because on Pc will be the next instruction, not the one stopped at
+                selectedInstruction = dissasembledBlocks[emulator.Chip8.Pc-2];
+                selectedInstruction.Background = Brushes.Yellow;
+                selectedInstruction.BringIntoView();
+            }
+        }
 
         /// <summary>
         /// Only updates the UI if the value has changed

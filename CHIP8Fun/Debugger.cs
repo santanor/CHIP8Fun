@@ -7,8 +7,8 @@ namespace CHIP8Fun
     {
         private readonly Emulator emulator;
         private bool isDebuggerRunning;
-        private bool paused;
-        private bool stepOver;
+        public bool Paused {get; set;}
+        public bool StepOver {get; set;}
 
         /// <summary>
         /// Registers the emulator on create
@@ -26,13 +26,13 @@ namespace CHIP8Fun
         private void Pause()
         {
             isDebuggerRunning = true;
-            paused = true;
+            Paused = true;
         }
 
         private void Step()
         {
-            paused = false;
-            stepOver = true;
+            Paused = false;
+            StepOver = true;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace CHIP8Fun
         /// </summary>
         private void Continue()
         {
-            paused = false;
+            Paused = false;
             isDebuggerRunning = false;
         }
 
@@ -51,7 +51,7 @@ namespace CHIP8Fun
         {
             while (true)
             {
-                if (paused)
+                if (Paused)
                 {
                     //Just wait a little bit to free up the cpu
                     Thread.Sleep(10);
@@ -64,10 +64,10 @@ namespace CHIP8Fun
                     emulator.TryUpdateUiData();
 
                     //If the execution was done by a step, reset the values so it works properly
-                    if (stepOver)
+                    if (StepOver)
                     {
-                        stepOver = false;
-                        paused = true;
+                        StepOver = false;
+                        Paused = true;
                     }
                 }
             }
@@ -81,7 +81,7 @@ namespace CHIP8Fun
                 case Key.System:
                     Step();
                     break;
-                case Key.F5 when paused:
+                case Key.F5 when Paused:
                     Continue();
                     break;
                 case Key.F5:

@@ -17,7 +17,7 @@ namespace CHIP8Fun
         public CHIP8System Chip8;
         public bool IsRunning;
         public const bool Debug = true;
-        private Debugger debugger;
+        public Debugger Debugger;
         private double timerCounter;
         public byte[] ProgramCode;
 
@@ -63,8 +63,8 @@ namespace CHIP8Fun
 
             if (Debug)
             {
-                debugger = new Debugger(this);
-                debugger.Run();
+                Debugger = new Debugger(this);
+                Debugger.Run();
             }
             else
             {

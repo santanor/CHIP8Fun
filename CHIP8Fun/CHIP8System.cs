@@ -32,7 +32,7 @@ namespace CHIP8Fun
             Keys = new byte[16];
 
             Pc = 0x200; // Program counter starts at 0x200
-            opcode = 0; // Reset current opcode
+            Opcode = 0; // Reset current opcode
             I = 0; // Reset index register
             Sp = 0; // Reset stack pointer
 
@@ -55,8 +55,8 @@ namespace CHIP8Fun
         /// </summary>
         public void EmulateCycle()
         {
-            opcode = FetchOpcode();
-            DecodeOpcode(opcode);
+            Opcode = FetchOpcode();
+            DecodeOpcode(Opcode);
             UpdateTimers();
         }
 
@@ -187,7 +187,7 @@ namespace CHIP8Fun
                             cpu._8XYE(code);
                             break;
                         default:
-                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {Opcode:X}");
                             break;
                     }
 
@@ -220,7 +220,7 @@ namespace CHIP8Fun
                             cpu.EXA1(code);
                             break;
                         default:
-                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {Opcode:X}");
                             break;
                     }
 
@@ -257,7 +257,7 @@ namespace CHIP8Fun
                             cpu.FX65(code);
                             break;
                         default:
-                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {Opcode:X}");
                             break;
                     }
                     break;
@@ -267,7 +267,7 @@ namespace CHIP8Fun
                 //In this case we add an additional switch and compare the last four bits:
                 case 0x0000:
                 {
-                    switch (opcode & 0x000F)
+                    switch (Opcode & 0x000F)
                     {
                         case 0x0000: // 0x00E0: Clears the screen
                             cpu._00E0();
@@ -276,7 +276,7 @@ namespace CHIP8Fun
                             cpu._00EE(code);
                             break;
                         default:
-                            Debug.WriteLine($"Unknown opcode [0x0000]: {opcode:X}");
+                            Debug.WriteLine($"Unknown opcode [0x0000]: {Opcode:X}");
                             break;
                     }
 
@@ -285,7 +285,7 @@ namespace CHIP8Fun
 
 
                 default:
-                    Debug.WriteLine($"Unknown opcode: {opcode:X}");
+                    Debug.WriteLine($"Unknown opcode: {Opcode:X}");
                     break;
             }
         }
@@ -348,7 +348,7 @@ namespace CHIP8Fun
         /// The Chip 8 has 35 opcodes which are all two bytes long. To store the current opcode,
         /// we need a data type that allows us to store two bytes.
         /// </summary>
-        private short opcode;
+        public short Opcode;
 
         /// <summary>
         /// The Chip 8 has 4K memory in total, which we can emulated as this

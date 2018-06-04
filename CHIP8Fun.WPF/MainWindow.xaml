@@ -9,9 +9,9 @@
         <!--Dissasembled code and executable-->
         <StackPanel MaxWidth="1000" HorizontalAlignment="Stretch">
             <!--Code-->
-            <ScrollViewer Height="200" Width="480" MaxWidth="1000">
-                <TextBlock Name="DissasembledCode"></TextBlock>
-            </ScrollViewer>
+            <FlowDocumentScrollViewer Height="200" Width="480">
+                <FlowDocument Name="DissasembledCode" FontSize="11"></FlowDocument>
+            </FlowDocumentScrollViewer>
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <Image
                 Name="bmp"
@@ -40,6 +40,7 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <!--PC-->
@@ -57,14 +58,19 @@
                 <TextBox Name="SPValue" Grid.Row="2" Grid.Column="1" Text="SP"
                          HorizontalAlignment="Stretch" IsEnabled="False" />
 
+                <!--Opcode-->
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="OPCODE" />
+                <TextBox Name="OpcodeValue" Grid.Row="3" Grid.Column="1" Text="SP"
+                         HorizontalAlignment="Stretch" IsEnabled="False" />
+
                 <!--Delay timer-->
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="DELAY" />
-                <TextBox Name="DelayTimerValue" Grid.Row="3" Grid.Column="1" Text="DELAY"
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="DELAY" />
+                <TextBox Name="DelayTimerValue" Grid.Row="4" Grid.Column="1" Text="DELAY"
                          HorizontalAlignment="Stretch" IsEnabled="False" />
 
                 <!--Sound timer-->
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="SOUND" />
-                <TextBox Name="SoundtimerValue" Grid.Row="4" Grid.Column="1" Text="SOUND"
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="SOUND" />
+                <TextBox Name="SoundtimerValue" Grid.Row="5" Grid.Column="1" Text="SOUND"
                          HorizontalAlignment="Stretch" IsEnabled="False" />
             </Grid>
 

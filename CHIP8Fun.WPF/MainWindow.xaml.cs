@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using CHIP8Fun.Disassembler;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace CHIP8Fun.WPF
 {
@@ -18,7 +20,6 @@ namespace CHIP8Fun.WPF
     public partial class MainWindow
     {
         private Emulator emulator;
-        private Disassembler.Disassembler disassembler;
         private TextBox[] keyValues;
         private TextBox[] memoryValues;
         private TextBox[] registersValues;
@@ -56,22 +57,29 @@ namespace CHIP8Fun.WPF
             emulator.OnUiTick += OnRefreshDebugGrids;
 
             //Initialize the dissasembler
-            disassembler = new Disassembler.Disassembler(emulator.ProgramCode);
-            DissasembledCode.Text = FormatDissasembledCode(disassembler.Dissasemble());
+            var disassembler = new Disassembler.Disassembler(emulator.ProgramCode);
+            FormatDissasembledCode(disassembler.Dissasemble());
         }
 
-        private string FormatDissasembledCode(DissasembledModel dissasemble)
+        private void FormatDissasembledCode(DissasembledModel dissasemble)
         {
-            var sb = new StringBuilder();
             foreach (var dlm in dissasemble.LineModels)
             {
+                var descriptionText = new Run() {Foreground = Brushes.DarkGray};
+                var sb = new StringBuilder();
                 sb.AppendLine(dlm.Description);
                 sb.Append("\t").AppendLine(dlm.AssemblyCode);
-                sb.Append("\t").AppendLine(dlm.Opcode);
-                sb.AppendLine();
-            }
+                descriptionText.Text = sb.ToString();
 
-            return sb.ToString();
+                var opcodeText = new Run()
+                {
+                    FontWeight = FontWeights.Bold,
+                    Text = $"\t{dlm.Opcode}\n"
+                };
+
+                DissasembledCode.Inlines.Add(descriptionText);
+                DissasembledCode.Inlines.Add(opcodeText);
+            }
         }
 
         /// <summary>
@@ -150,6 +158,7 @@ namespace CHIP8Fun.WPF
             catch (Exception e)
             {
                 Debug.WriteLine("Thank you for playing Wing Commander");
+                Environment.Exit(0);
             }
         }
 
@@ -180,6 +189,7 @@ namespace CHIP8Fun.WPF
             catch (Exception e)
             {
                 Debug.WriteLine("Thank you for playing Wing Commander");
+                Environment.Exit(0);
             }
         }
 

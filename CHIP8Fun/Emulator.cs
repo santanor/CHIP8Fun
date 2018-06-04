@@ -98,7 +98,7 @@ namespace CHIP8Fun
             var milisecondsSinceLastUpdate = currentTime - timerCounter;
 
             //more than 1/60th of a second passed
-            if (milisecondsSinceLastUpdate > 20)
+            if (milisecondsSinceLastUpdate > 30)
             {
                 timerCounter = currentTime;
                 OnUiTick?.Invoke();

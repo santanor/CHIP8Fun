@@ -35,11 +35,11 @@ namespace CHIP8Fun
             {
                 for (var j = 0; j < s.Gfx.GetLength(1); j++)
                 {
-                    s.Gfx[i, j] = true;
+                    s.Gfx[i, j] = 0;
                 }
             }
 
-            s.V[15] = 1;
+            s.DrawFlag = true;
             s.Pc += 2;
         }
 
@@ -404,10 +404,22 @@ namespace CHIP8Fun
             var spriteData = new byte[N];
             for (var i = 0; i < N; i++)
             {
-                spriteData[i] = s.Memory[s.I + i];
+                var pixel = s.Memory[s.I + i];
+                for (var j = 0; j < 8; j ++) {
+                    if ((pixel & 0x80) != 0) {
+                        var screenY = (s.V[y] + i);
+                        var screenX = (s.V[x] + j);
+                        if (s.Gfx[screenX, screenY] == 1)
+                        {
+                            s.V[s.VF] = 1;
+                        }
+                        s.Gfx[screenX, screenY] ^= 1;
+                    }
+                    pixel <<= 1;
+                }
             }
 
-            s.Draw(s.V[x], s.V[y], spriteData);
+            s.DrawFlag = true;
             s.Pc += 2;
         }
 

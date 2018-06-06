@@ -58,7 +58,7 @@ namespace CHIP8Fun
         {
             // Initialize the Chip8 system and load the game into the memory
             Chip8 = new CHIP8System(backingImage);
-            ProgramCode = Chip8.LoadProgram("Tetris.ch8");
+            ProgramCode = Chip8.LoadProgram("Picture.ch8");
             IsRunning = true;
 
             if (Debug)
@@ -110,11 +110,11 @@ namespace CHIP8Fun
         /// </summary>
         public void TryPresentFrame()
         {
-            if (Chip8.V[15] == 1)
+            if (Chip8.DrawFlag)
             {
                 var newFrame = DrawGraphics();
                 OnNewFrame?.Invoke(newFrame);
-                Chip8.V[15] = 0;
+                Chip8.DrawFlag = false;
             }
         }
 
@@ -124,12 +124,12 @@ namespace CHIP8Fun
         /// <returns></returns>
         private Bitmap DrawGraphics()
         {
-            var bmp = new Bitmap(64, 32);
-            for (var i = 0; i < 64; i++)
+            var bmp = new Bitmap(Chip8.Height, Chip8.Width);
+            for (var i = 0; i < Chip8.Height; i++)
             {
-                for (var j = 0; j < 32; j++)
+                for (var j = 0; j < Chip8.Width; j++)
                 {
-                    bmp.SetPixel(i, j, Chip8.Gfx[i, j] ? Color.White : Color.Black);
+                    bmp.SetPixel(i, j, Chip8.Gfx[i, j] == 1 ? Color.White : Color.Black);
                 }
             }
 

@@ -27,7 +27,7 @@ namespace CHIP8Fun
         {
             Memory = new byte[4096];
             V = new byte[16];
-            Gfx = new bool[64, 32];
+            Gfx = new byte[Height, Width];
             Stack = new short[16];
             Keys = new byte[16];
 
@@ -102,28 +102,6 @@ namespace CHIP8Fun
         {
             return (short)((Memory[Pc] << 8) | Memory[Pc + 1]);
         }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="sprite"></param>
-        public void Draw(int x, int y, byte[] sprite)
-        {
-            var spriteBits = new BitArray(sprite);
-            for (var i = 0; i < sprite.Length; i++)
-            {
-                for (var j = 0; j < 8; j++)
-                {
-                    Gfx[j, i] = spriteBits[(i * 8) + j];
-                }
-            }
-
-            //Notify the system to redraw the screen
-            V[15] = 1;
-        }
-
 
         /// <summary>
         /// Here's where most of the magic happens, it routes the execution of the emulator decoding the opcode
@@ -342,6 +320,10 @@ namespace CHIP8Fun
             return 0;
         }
 
+        public bool DrawFlag;
+        public readonly int Width = 32;
+        public readonly int Height = 64;
+
         #region System specification
 
         /// <summary>
@@ -387,7 +369,7 @@ namespace CHIP8Fun
         /// The graphics of the Chip 8 are black and white and the screen has a total of 2048 pixels (64 x 32).
         /// This can easily be implemented using an array that hold the pixel state (1 or 0):
         /// </summary>
-        public bool[,] Gfx;
+        public byte[,] Gfx;
 
         /// <summary>
         /// Interupts and hardware registers. The Chip 8 has none,

@@ -408,7 +408,9 @@ namespace CHIP8Fun
                 for (var j = 0; j < 8; j ++) {
                     if ((pixel & 0x80) != 0) {
                         var screenY = (s.V[y] + i);
+                        //while (screenY > s.Height) screenY -= s.Height;
                         var screenX = (s.V[x] + j);
+                        //while (screenX > s.Width) screenX -= s.Width;
                         if (s.Gfx[screenX, screenY] == 1)
                         {
                             s.V[s.VF] = 1;

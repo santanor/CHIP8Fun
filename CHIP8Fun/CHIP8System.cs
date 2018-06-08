@@ -61,6 +61,15 @@ namespace CHIP8Fun
         }
 
         /// <summary>
+        /// Manually executes an opcode. Mainly used for testing
+        /// </summary>
+        /// <param name="opcode"></param>
+        public void ExecuteOpcode(short opcode)
+        {
+            DecodeOpcode(Opcode);
+        }
+
+        /// <summary>
         /// The timers have to work at 60Hz, so we'll simulate that by counting the miliseconds since
         /// the last update
         /// </summary>

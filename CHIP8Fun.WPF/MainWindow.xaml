@@ -4,8 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Width="1000" Height="480">
+        Title="MainWindow" Width="1000" Height="500">
     <DockPanel HorizontalAlignment="Left">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Emulator">
+                <MenuItem Header="Debug..." Click="MenuDebugRom"/>
+                <MenuItem Header="Run..." Click="MenuRunRom"/>
+            </MenuItem>
+        </Menu>
         <!--Dissasembled code and executable-->
         <StackPanel MaxWidth="1000" HorizontalAlignment="Stretch">
             <!--Code-->

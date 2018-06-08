@@ -18,6 +18,7 @@ namespace CHIP8Fun
         {
             this.emulator = emulator;
             this.emulator.OnUIKeyDown += OnUIKeyDown;
+            this.Paused = true;
         }
 
         /// <summary>
@@ -77,8 +78,7 @@ namespace CHIP8Fun
         {
             switch (keyEventArgs.Key)
             {
-                //Apparently this is the value for F10
-                case Key.System:
+                case Key.F9:
                     Step();
                     break;
                 case Key.F5 when Paused:

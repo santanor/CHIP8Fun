@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using CHIP8Fun.Disassembler;
+using Microsoft.Win32;
 using Brushes = System.Windows.Media.Brushes;
 
 namespace CHIP8Fun.WPF
@@ -36,18 +37,21 @@ namespace CHIP8Fun.WPF
         private TextBox[] stackValues;
         private IDictionary<int, Paragraph> dissasembledBlocks;
 
+        private Thread emulatorThread;
+
         public MainWindow()
         {
             InitializeComponent();
+        }
 
-            //Starts the emulator
-            var thread = new Thread(() =>
+        private void InitializeEmulator(string fileName, bool debug)
+        {
+            emulatorThread = new Thread(() =>
             {
-                emulator = new Emulator();
-                emulator.Run();
+                emulator = new Emulator {Debug = debug};
+                emulator.Run(fileName);
             });
-
-            thread.Start();
+            emulatorThread.Start();
 
             //Wait for the emulator to be available
             while (emulator?.IsRunning != true)
@@ -237,10 +241,14 @@ namespace CHIP8Fun.WPF
                     selectedInstruction.Background = Brushes.Transparent;
                 }
 
-                //We do Pc-2 because on Pc will be the next instruction, not the one stopped at
-                selectedInstruction = dissasembledBlocks[emulator.Chip8.Pc-2];
-                selectedInstruction.Background = Brushes.Yellow;
-                selectedInstruction.BringIntoView();
+                var pcValue = emulator.Chip8.Pc % 2 == 0 ? emulator.Chip8.Pc - 2 : emulator.Chip8.Pc - 1;
+                if (dissasembledBlocks.TryGetValue(pcValue, out var instruction))
+                {
+                    //We do Pc-2 because on Pc will be the next instruction, not the one stopped at
+                    selectedInstruction = instruction;
+                    selectedInstruction.Background = Brushes.Yellow;
+                    selectedInstruction.BringIntoView();
+                }
             }
         }
 
@@ -258,6 +266,32 @@ namespace CHIP8Fun.WPF
                 {
                     gridValues[i].Text = data[i].ToString();
                 }
+            }
+        }
+
+        private void MenuRunRom(object sender, RoutedEventArgs e)
+        {
+            ShowDialogAndRun(true);
+        }
+
+        private void MenuDebugRom(object sender, RoutedEventArgs e)
+        {
+            ShowDialogAndRun(true);
+        }
+
+        private void ShowDialogAndRun(bool debug)
+        {
+            var fileDialog = new OpenFileDialog();
+            fileDialog.DefaultExt = ".ch8";
+
+            var result = fileDialog.ShowDialog();
+
+            // Get the selected file name and display in a TextBox
+            if (result == true)
+            {
+                // Open document
+                var filename = fileDialog.FileName;
+                InitializeEmulator(filename, debug);
             }
         }
     }

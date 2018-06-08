@@ -16,7 +16,7 @@ namespace CHIP8Fun
         private Bitmap backingImage;
         public CHIP8System Chip8;
         public bool IsRunning;
-        public const bool Debug = true;
+        public bool Debug = true;
         public Debugger Debugger;
         private double timerCounter;
         public byte[] ProgramCode;
@@ -54,11 +54,11 @@ namespace CHIP8Fun
         /// <summary>
         /// Emulator Loop
         /// </summary>
-        public void Run()
+        public void Run(string filename)
         {
             // Initialize the Chip8 system and load the game into the memory
             Chip8 = new CHIP8System(backingImage);
-            ProgramCode = Chip8.LoadProgram("Picture.ch8");
+            ProgramCode = Chip8.LoadProgram(filename);
             IsRunning = true;
 
             if (Debug)

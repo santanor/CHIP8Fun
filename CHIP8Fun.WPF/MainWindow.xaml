@@ -11,6 +11,14 @@
                 <MenuItem Header="Debug..." Click="MenuDebugRom"/>
                 <MenuItem Header="Run..." Click="MenuRunRom"/>
             </MenuItem>
+            <MenuItem Header="Clock Speed">
+                <MenuItem Header="500Hz" Click="MenuSetClockSpeed" Tag="500"/>
+                <MenuItem Header="600Hz" Click="MenuSetClockSpeed" Tag="600"/>
+                <MenuItem Header="700Hz" Click="MenuSetClockSpeed" Tag="700"/>
+                <MenuItem Header="800Hz" Click="MenuSetClockSpeed" Tag="800"/>
+                <MenuItem Header="900Hz" Click="MenuSetClockSpeed" Tag="900"/>
+                <MenuItem Header="1000Hz" Click="MenuSetClockSpeed" Tag="1000"/>
+            </MenuItem>
         </Menu>
         <!--Dissasembled code and executable-->
         <StackPanel MaxWidth="1000" HorizontalAlignment="Stretch">

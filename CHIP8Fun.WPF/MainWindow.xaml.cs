@@ -164,8 +164,6 @@ namespace CHIP8Fun.WPF
         /// <param name="bmpSource"></param>
         private void OnImageChanged(Bitmap bmpSource)
         {
-            var sw = new Stopwatch();
-            sw.Start();
             try
             {
                 bmp.Dispatcher.Invoke(() =>
@@ -186,8 +184,6 @@ namespace CHIP8Fun.WPF
                 Debug.WriteLine("Thank you for playing Wing Commander");
                 Environment.Exit(0);
             }
-            sw.Stop();
-            Debug.WriteLine(sw.Elapsed);
         }
 
         /// <summary>
@@ -293,6 +289,12 @@ namespace CHIP8Fun.WPF
                 var filename = fileDialog.FileName;
                 InitializeEmulator(filename, debug);
             }
+        }
+
+        private void MenuSetClockSpeed(object sender, RoutedEventArgs e)
+        {
+            var speed = ((MenuItem)sender).Tag.ToString();
+            emulator.Chip8.ClockSpeed = int.Parse(speed);
         }
     }
 }

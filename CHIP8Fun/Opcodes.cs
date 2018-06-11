@@ -52,6 +52,7 @@ namespace CHIP8Fun
         {
             s.Sp--;
             s.Pc = s.Stack[s.Sp];
+            s.Stack[s.Sp] = 0;
             s.Pc += 2;
         }
 
@@ -408,9 +409,11 @@ namespace CHIP8Fun
                 for (var j = 0; j < 8; j ++) {
                     if ((pixel & 0x80) != 0) {
                         var screenY = (s.V[y] + i);
-                        //while (screenY > s.Height) screenY -= s.Height;
                         var screenX = (s.V[x] + j);
-                        //while (screenX > s.Width) screenX -= s.Width;
+
+                        //Wraps around if the pixel pos is greater than the screen
+                        while (screenY >= s.Width) screenY -= s.Width;
+                        while (screenX >= s.Height) screenX -= s.Height;
                         if (s.Gfx[screenX, screenY] == 1)
                         {
                             s.V[s.VF] = 1;

@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHIP8Fun.WPF", "CHIP8Fun.WP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHIP8Fun.Disassembler", "CHIP8Fun.Disassembler\CHIP8Fun.Disassembler.csproj", "{BFF566A3-4CB3-449D-8CE5-6026B39DE8EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHIP8Fun.Tests", "CHIP8Fun.Tests\CHIP8Fun.Tests.csproj", "{EC13C985-5FD3-46B9-9BBE-2986C9EC53F2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{BFF566A3-4CB3-449D-8CE5-6026B39DE8EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFF566A3-4CB3-449D-8CE5-6026B39DE8EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFF566A3-4CB3-449D-8CE5-6026B39DE8EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EC13C985-5FD3-46B9-9BBE-2986C9EC53F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EC13C985-5FD3-46B9-9BBE-2986C9EC53F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EC13C985-5FD3-46B9-9BBE-2986C9EC53F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EC13C985-5FD3-46B9-9BBE-2986C9EC53F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

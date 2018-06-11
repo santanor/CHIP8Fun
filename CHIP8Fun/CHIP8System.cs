@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Runtime.Serialization.Formatters;
+using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -43,8 +44,6 @@ namespace CHIP8Fun
             }
 
             cpu = new Opcodes(this);
-
-            // Reset timers
         }
 
         /// <summary>
@@ -58,15 +57,32 @@ namespace CHIP8Fun
             Opcode = FetchOpcode();
             DecodeOpcode(Opcode);
             UpdateTimers();
+            WaitAndMatchHostSpeed();
         }
 
         /// <summary>
-        /// Manually executes an opcode. Mainly used for testing
+        /// Tries to match the emulated clock speed. To do so it divides the remaining instructions to be executed
+        /// in the current second and waits
         /// </summary>
-        /// <param name="opcode"></param>
-        public void ExecuteOpcode(short opcode)
+        private void WaitAndMatchHostSpeed()
         {
-            DecodeOpcode(Opcode);
+            //A second has passed so start over
+            if (cpuTimer > 1000)
+            {
+                cpuTimer = 0;
+                cycleCount = 0;
+                cpuCachedTime = DateTime.Now;
+            }
+
+            var shouldHaveElapsed = (cycleCount * 1000)/ClockSpeed;
+            //The PC is going faster than the emulated cpu. Wait!
+            if (shouldHaveElapsed > cpuTimer)
+            {
+                Thread.Sleep((int)(shouldHaveElapsed - cpuTimer));
+            }
+
+            cycleCount++;
+            cpuTimer = (DateTime.Now - cpuCachedTime).TotalMilliseconds;
         }
 
         /// <summary>
@@ -89,11 +105,7 @@ namespace CHIP8Fun
 
                 if (SoundTimer > 0)
                 {
-                    if (SoundTimer == 1)
-                    {
-                        Console.WriteLine("BEEP!");
-                    }
-
+                    Console.WriteLine("BEEP!");
                     SoundTimer--;
                 }
             }
@@ -332,6 +344,24 @@ namespace CHIP8Fun
         public bool DrawFlag;
         public readonly int Width = 32;
         public readonly int Height = 64;
+
+        #region Clock speed matching stuff
+
+        /// <summary>
+        /// Defines the CPU speed in Hertzs
+        /// </summary>
+        public int ClockSpeed = 600;
+        private int cycleCount;
+        private double cpuTimer;
+        private DateTime cpuCachedTime;
+        private int remainingOpcodesThisSecond;
+
+        #endregion
+
+        /// <summary>
+        /// Defines the timer speeds in Hertzs
+        /// </summary>
+        public int TimerSpeed = 60;
 
         #region System specification
 
